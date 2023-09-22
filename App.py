@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
+import random
+import string
 
 # Sample data store for books
 books = []
@@ -38,10 +40,21 @@ def search_books():
     pass
 
 
-# Function to populate the table with book data
+# Function to populate the table with random data
 def populate_table():
-    # Add code to populate the table with data from the 'books' list.
-    pass
+    for _ in range(50):  # Add 50 random/fake data rows
+        book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        book_name = ''.join(random.choices(string.ascii_letters, k=10))
+        book_subject = ''.join(random.choices(string.ascii_letters, k=8))
+        author_name = ''.join(random.choices(string.ascii_letters, k=8))
+        publication = ''.join(random.choices(string.ascii_letters, k=8))
+        date_of_publication = f"{random.randint(2000, 2022)}-{random.randint(1, 12)}-{random.randint(1, 28)}"
+        book_price = round(random.uniform(10, 50), 2)
+        book_quantity = random.randint(1, 100)
+        total_cost = round(book_price * book_quantity, 2)
+
+        table.insert("", "end", values=(book_id, book_name, book_subject, author_name, publication,
+                                        date_of_publication, book_price, book_quantity, total_cost))
 
 
 def cancel():
@@ -64,9 +77,13 @@ screen_width = main_window.winfo_screenwidth()
 screen_height = main_window.winfo_screenheight()
 main_window.geometry(f'{screen_width}x{screen_height}')
 
+tk.Label(main_window, text="Admin Panel").place(x=screen_width / 2 - 50, y=20)
+
+tk.Label(main_window, text="-- Maintain Book --").place(x=200, y=50)
+
 # First Frame (Add/Update/Delete)
 form_frame = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=350)
-form_frame.place(x=200, y=50)
+form_frame.place(x=200, y=80)
 
 # Labels and Entry Widgets
 labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
@@ -89,17 +106,17 @@ while i < len(labels):
 price_label = tk.Label(form_frame, text="Book Price")
 price_label.place(x=20, y=j * 50 + 20)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=10, command=calculate_total)
-price_spinbox.place(x=120, y=j * 50 + 20)
+price_spinbox.place(x=120, y=j * 50 + 20, height=20)
 
 quantity_label = tk.Label(form_frame, text="Book Quantity")
 quantity_label.place(x=200, y=j * 50 + 20)
 quantity_spinbox = tk.Spinbox(form_frame, from_=0, to=999, width=10, command=calculate_total)
-quantity_spinbox.place(x=300, y=j * 50 + 20)
+quantity_spinbox.place(x=300, y=j * 50 + 20, height=20)
 
 total_label = tk.Label(form_frame, text="Total Cost")
 total_label.place(x=400, y=j * 50 + 20)
 total_entry = tk.Entry(form_frame, state="readonly")
-total_entry.place(x=560, y=j * 50 + 20, width=200)
+total_entry.place(x=560, y=j * 50 + 20, width=200, height=30)
 
 # Action Buttons
 add_button = tk.Button(form_frame, width=20, text="Add", command=add_book)
@@ -107,54 +124,63 @@ update_button = tk.Button(form_frame, width=20, text="Update", command=update_bo
 delete_button = tk.Button(form_frame, width=20, text="Delete", command=delete_book)
 cancel_button = tk.Button(form_frame, width=20, text="Cancel", command=cancel)
 
-add_button.place(x=50, y=(j + 2) * 45 + 20)
-update_button.place(x=230, y=(j + 2) * 45 + 20)
-delete_button.place(x=410, y=(j + 2) * 45 + 20)
-cancel_button.place(x=590, y=(j + 2) * 45 + 20)
+add_button.place(x=50, y=(j + 2) * 45 + 20, height=30)
+update_button.place(x=230, y=(j + 2) * 45 + 20, height=30)
+delete_button.place(x=410, y=(j + 2) * 45 + 20, height=30)
+cancel_button.place(x=590, y=(j + 2) * 45 + 20, height=30)
 
 # Image Frame
-img_frame = tk.Frame(form_frame, relief="solid", borderwidth=2, width=350, height=300)
-img_frame.place(x=800, y=20)
+img_choose_frame = tk.Frame(form_frame, relief="solid", borderwidth=2, width=350, height=300)
+img_choose_frame.place(x=800, y=20)
 # Image Button
-image_button = tk.Button(img_frame, width=20, text="Choose Image", command=choose_image)
-image_button.place(x=100, y=250)
+image_button = tk.Button(img_choose_frame, width=20, text="Choose Image", command=choose_image)
+image_button.place(x=100, y=250, height=30)
+
+tk.Label(main_window, text="-- Filter Book --").place(x=200, y=460)
 
 # Second Frame (Search)
-frame2 = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=100)
-frame2.place(x=200, y=500)
+filter_frame = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 800, height=70)
+filter_frame.place(x=400, y=490)
 
 # Dropdown for search criteria
 search_criteria = tk.StringVar()
 search_criteria.set("Id")  # Default search criteria
-search_dropdown = ttk.Combobox(frame2, textvariable=search_criteria,
+search_dropdown = ttk.Combobox(filter_frame, textvariable=search_criteria,
                                values=["Id", "Book Name", "Publication", "Book Subject"])
-search_dropdown.place(x=20, y=20, width=200)
+search_dropdown.place(x=20, y=20, width=150, height=30)
 
 # Input field for search text
-search_text = tk.Entry(frame2)
-search_text.place(x=240, y=20, width=200)
+search_text = tk.Entry(filter_frame)
+search_text.place(x=200, y=20, width=250, height=30)
 
 # Search Button
-search_button = tk.Button(frame2, text="Search", command=search_books)
-search_button.place(x=460, y=20, width=100)
+search_button = tk.Button(filter_frame, text="Search", command=search_books)
+search_button.place(x=500, y=20, width=250, height=30)
+
+tk.Label(main_window, text="-- Available Book --").place(x=200, y=590)
 
 # Third Frame (Table)
-frame3 = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=150)
-frame3.place(x=200, y=620)
+table_frame = tk.Frame(main_window)
+table_frame.place(x=200, y=620, width=screen_width - 400, height=200)
 
 # Create a Treeview widget to display the table
 columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication", "Book Price",
            "Book Quantity", "Total Cost")
-table = ttk.Treeview(frame3, columns=columns, show="headings")
+table = ttk.Treeview(table_frame, columns=columns, show="headings")
 
 # Add headings to the table
 for col in columns:
     table.heading(col, text=col)
     table.column(col, width=80)  # Adjust column width as needed
 
-table.place(x=20, y=20, width=560, height=110)
+# Add a vertical scrollbar
+table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
+table.configure(yscrollcommand=table_scrollbar.set)
+table_scrollbar.pack(side="right", fill="y")
 
-# Populate the table with book data
+table.pack(fill="both", expand=True)
+
+# Populate the table with random data
 populate_table()
 
 main_window.mainloop()
