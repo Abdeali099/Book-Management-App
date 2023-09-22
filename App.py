@@ -59,18 +59,14 @@ def calculate_total():
 main_window = tk.Tk()
 main_window.title("Book Management")
 
-# Center the main window
-window_width = 1200
-window_height = 700
+# Configure the main window size and position
 screen_width = main_window.winfo_screenwidth()
 screen_height = main_window.winfo_screenheight()
-x_coordinate = (screen_width / 2) - (window_width / 2)
-y_coordinate = (screen_height / 2) - (window_height / 2)
-main_window.geometry(f'{window_width}x{window_height}+{int(x_coordinate)}+{int(y_coordinate)}')
+main_window.geometry(f'{screen_width}x{screen_height}')
 
 # First Frame (Add/Update/Delete)
-form_frame = tk.Frame(main_window, relief="solid", borderwidth=2)
-form_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+form_frame = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=350)
+form_frame.place(x=200, y=50)
 
 # Labels and Entry Widgets
 labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
@@ -79,69 +75,72 @@ i = 0
 j = 0
 
 while i < len(labels):
-    tk.Label(form_frame, text=labels[i]).grid(row=j, column=0, padx=5, pady=5, sticky="e")
-    tk.Entry(form_frame).grid(row=j, column=1, padx=5, pady=5, sticky="w")
+    tk.Label(form_frame, text=labels[i]).place(x=20, y=j * 50 + 20)
+    tk.Entry(form_frame).place(x=180, y=j * 50 + 20, width=200, height=30)
 
     i += 1
-    tk.Label(form_frame, text=labels[i]).grid(row=j, column=1, padx=5, pady=5, sticky="e")
-    tk.Entry(form_frame).grid(row=j, column=2, padx=5, pady=5, sticky="w")
+    tk.Label(form_frame, text=labels[i]).place(x=400, y=j * 50 + 20)
+    tk.Entry(form_frame).place(x=560, y=j * 50 + 20, width=200, height=30)
 
     i += 1
     j += 1
 
 # Price, Quantity, and Total
 price_label = tk.Label(form_frame, text="Book Price")
-price_label.grid(row=len(labels), column=0, padx=5, pady=5, sticky="e")
+price_label.place(x=20, y=j * 50 + 20)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=10, command=calculate_total)
-price_spinbox.grid(row=len(labels), column=1, padx=5, pady=5, sticky="w")
+price_spinbox.place(x=120, y=j * 50 + 20)
 
 quantity_label = tk.Label(form_frame, text="Book Quantity")
-quantity_label.grid(row=len(labels) + 1, column=0, padx=5, pady=5, sticky="e")
+quantity_label.place(x=200, y=j * 50 + 20)
 quantity_spinbox = tk.Spinbox(form_frame, from_=0, to=999, width=10, command=calculate_total)
-quantity_spinbox.grid(row=len(labels) + 1, column=1, padx=5, pady=5, sticky="w")
+quantity_spinbox.place(x=300, y=j * 50 + 20)
 
 total_label = tk.Label(form_frame, text="Total Cost")
-total_label.grid(row=len(labels) + 2, column=0, padx=5, pady=5, sticky="e")
+total_label.place(x=400, y=j * 50 + 20)
 total_entry = tk.Entry(form_frame, state="readonly")
-total_entry.grid(row=len(labels) + 2, column=1, padx=5, pady=5, sticky="w")
-
-# Image Button
-image_button = tk.Button(form_frame, text="Choose Image", command=choose_image)
-image_button.grid(row=0, column=2, padx=5, pady=5, rowspan=len(labels) + 3)
+total_entry.place(x=560, y=j * 50 + 20, width=200)
 
 # Action Buttons
-add_button = tk.Button(form_frame, text="Add", command=add_book)
-update_button = tk.Button(form_frame, text="Update", command=update_book)
-delete_button = tk.Button(form_frame, text="Delete", command=delete_book)
-cancel_button = tk.Button(form_frame, text="Cancel", command=cancel)
+add_button = tk.Button(form_frame, width=20, text="Add", command=add_book)
+update_button = tk.Button(form_frame, width=20, text="Update", command=update_book)
+delete_button = tk.Button(form_frame, width=20, text="Delete", command=delete_book)
+cancel_button = tk.Button(form_frame, width=20, text="Cancel", command=cancel)
 
-add_button.grid(row=len(labels) + 3, column=0, padx=5, pady=10)
-update_button.grid(row=len(labels) + 3, column=1, padx=5, pady=10)
-delete_button.grid(row=len(labels) + 3, column=2, padx=5, pady=10)
-cancel_button.grid(row=len(labels) + 3, column=3, padx=5, pady=10)
+add_button.place(x=50, y=(j + 2) * 45 + 20)
+update_button.place(x=230, y=(j + 2) * 45 + 20)
+delete_button.place(x=410, y=(j + 2) * 45 + 20)
+cancel_button.place(x=590, y=(j + 2) * 45 + 20)
+
+# Image Frame
+img_frame = tk.Frame(form_frame, relief="solid", borderwidth=2, width=350, height=300)
+img_frame.place(x=800, y=20)
+# Image Button
+image_button = tk.Button(img_frame, width=20, text="Choose Image", command=choose_image)
+image_button.place(x=100, y=250)
 
 # Second Frame (Search)
-frame2 = tk.Frame(main_window)
-frame2.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+frame2 = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=100)
+frame2.place(x=200, y=500)
 
 # Dropdown for search criteria
 search_criteria = tk.StringVar()
 search_criteria.set("Id")  # Default search criteria
 search_dropdown = ttk.Combobox(frame2, textvariable=search_criteria,
                                values=["Id", "Book Name", "Publication", "Book Subject"])
-search_dropdown.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+search_dropdown.place(x=20, y=20, width=200)
 
 # Input field for search text
 search_text = tk.Entry(frame2)
-search_text.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+search_text.place(x=240, y=20, width=200)
 
 # Search Button
 search_button = tk.Button(frame2, text="Search", command=search_books)
-search_button.grid(row=0, column=2, padx=5, pady=5)
+search_button.place(x=460, y=20, width=100)
 
 # Third Frame (Table)
-frame3 = tk.Frame(main_window)
-frame3.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+frame3 = tk.Frame(main_window, relief="solid", borderwidth=2, width=screen_width - 400, height=150)
+frame3.place(x=200, y=620)
 
 # Create a Treeview widget to display the table
 columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication", "Book Price",
@@ -151,21 +150,11 @@ table = ttk.Treeview(frame3, columns=columns, show="headings")
 # Add headings to the table
 for col in columns:
     table.heading(col, text=col)
-    table.column(col, width=120)
+    table.column(col, width=80)  # Adjust column width as needed
 
-table.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+table.place(x=20, y=20, width=560, height=110)
 
 # Populate the table with book data
 populate_table()
-
-# Configure grid column and row weights for resizing
-main_window.grid_rowconfigure(1, weight=1)
-main_window.grid_columnconfigure(0, weight=1)
-form_frame.grid_rowconfigure(len(labels) + 4, weight=1)
-form_frame.grid_columnconfigure(1, weight=1)
-frame2.grid_rowconfigure(0, weight=1)
-frame2.grid_columnconfigure(1, weight=1)
-frame3.grid_rowconfigure(0, weight=1)
-frame3.grid_columnconfigure(0, weight=1)
 
 main_window.mainloop()
