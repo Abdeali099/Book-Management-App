@@ -1,7 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog  # used for select cover image
-from tkinter import ttk  # used for combo-box , Scrollbar
-from PIL import Image, ImageTk  # used for set cover image
+from tkinter import filedialog
+from tkinter import ttk
+from PIL import Image, ImageTk
+import re
 import random
 import string
 
@@ -14,11 +15,11 @@ def choose_cover():
     if file_path:
         # You can display the selected image on the button or elsewhere in your UI.
         print(f"Selected image: {file_path}")
-        img_cover = Image.open(file_path)  # read the image file
-        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)  # new width & height
+        img_cover = Image.open(file_path)
+        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
         img_cover = ImageTk.PhotoImage(img_cover)
-        img_container.image = img_cover  # keep a reference! by attaching it to a widget attribute
-        img_container['image'] = img_cover  # Show Image
+        img_container.image = img_cover
+        img_container['image'] = img_cover
 
 
 # Function to add a book to the data store
@@ -48,16 +49,16 @@ def search_books():
 
 # Function to populate the table with random data
 def populate_table():
-    for _ in range(5):  # Add 50 random---fake data rows
+    for _ in range(5):
         book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         book_name = ''.join(random.choices(string.ascii_letters, k=10))
         book_subject = ''.join(random.choices(string.ascii_letters, k=8))
         author_name = ''.join(random.choices(string.ascii_letters, k=8))
         publication = ''.join(random.choices(string.ascii_letters, k=8))
         date_of_publication = f"{random.randint(2000, 2022)}-{random.randint(1, 12)}-{random.randint(1, 28)}"
-        book_price = round(random.uniform(10, 50), 2)
-        book_quantity = random.randint(1, 100)
-        total_cost = round(book_price * book_quantity, 2)
+        book_price = 0  # Set initial price to 0
+        book_quantity = 0  # Set initial quantity to 0
+        total_cost = book_price * book_quantity
 
         table.insert("", "end", values=(book_id, book_name, book_subject, author_name, publication,
                                         date_of_publication, book_price, book_quantity, total_cost))
@@ -70,8 +71,24 @@ def cancel():
 
 # Function to calculate the total price
 def calculate_total():
-    # Add code to calculate the total price based on price and quantity.
-    pass
+    # Get the values from the price and quantity spinboxes
+    pattern = re.compile(r"^\d+(\.\d+)?$")
+
+    price_value_str = price_spinbox.get()
+    quantity_value_str = quantity_spinbox.get()
+
+    if pattern.fullmatch(price_value_str) and pattern.fullmatch(quantity_value_str):
+        price = float(price_spinbox.get())
+        quantity = int(quantity_spinbox.get())
+
+        # Calculate the total cost
+        total_cost = price * quantity
+
+        # Update the total cost entry field
+        total_entry.config(state="normal")  # Enable editing
+        total_entry.delete(0, "end")  # Clear previous value
+        total_entry.insert(0, f"{total_cost:.2f}")  # Insert the new total cost
+        total_entry.config(state="readonly")  # Disable editing
 
 
 # -------------------------- GUI Application -------------------------- #
@@ -132,15 +149,25 @@ price_label = tk.Label(form_frame, text="Book Price", font=label_font, bg="#60cb
 price_label.place(x=20, y=j * 50 + 20)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=8, command=calculate_total, font=text_filed_font)
 price_spinbox.place(x=120, y=j * 50 + 20, height=30)
+price_spinbox.delete(0, "end")  # Set initial price to 0
+price_spinbox.insert(0, "0")
 
 quantity_label = tk.Label(form_frame, text="Book Quantity", font=label_font, bg="#60cb5f", fg="black")
 quantity_label.place(x=260, y=j * 50 + 20)
 quantity_spinbox = tk.Spinbox(form_frame, from_=0, to=999, width=8, command=calculate_total, font=text_filed_font)
 quantity_spinbox.place(x=390, y=j * 50 + 20, height=30)
+quantity_spinbox.delete(0, "end")  # Set initial quantity to 0
+quantity_spinbox.insert(0, "0")
+
+# Bind KeyRelease event to the price and quantity Spinboxes
+price_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
+quantity_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
 
 total_label = tk.Label(form_frame, text="Total Cost", font=label_font, bg="#60cb5f", fg="black")
 total_label.place(x=500, y=j * 50 + 20)
-total_entry = tk.Entry(form_frame, state="readonly", font=text_filed_font)
+total_entry = tk.Entry(form_frame, font=text_filed_font)
+total_entry.insert(0, "0.00")
+total_entry.config(state="readonly")  # Disable editing
 total_entry.place(x=660, y=j * 50 + 20, width=300, height=30)
 
 # Action Buttons (4 buttons)
@@ -163,11 +190,11 @@ img_container.place(x=990, y=20, width=150, height=200)
 
 # set default cover image
 img = Image.open(
-    "C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Lab-6/Book-Management-App/assets/byDefaultCover.jpg")  # read the image file
-img = img.resize((150, 200), reducing_gap=Image.LANCZOS)  # set width and height properly
+    "C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Lab-6/Book-Management-App/assets/byDefaultCover.jpg")
+img = img.resize((150, 200), reducing_gap=Image.LANCZOS)
 img = ImageTk.PhotoImage(img)
-img_container.image = img  # keep a reference! by attaching it to a widget attribute
-img_container['image'] = img  # Show Image
+img_container.image = img
+img_container['image'] = img
 
 # select cover Image Button
 image_button = tk.Button(form_frame, width=15, text="Choose Cover", command=choose_cover, font=button_font,
@@ -215,7 +242,7 @@ table = ttk.Treeview(table_frame, columns=columns, show="headings")
 # Add headings to the table
 for col in columns:
     table.heading(col, text=col)
-    table.column(col, width=80)  # Adjust column width as needed
+    table.column(col, width=80)
 
 # Add a vertical scrollbar
 table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
