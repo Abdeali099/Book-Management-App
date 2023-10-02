@@ -72,7 +72,7 @@ def cancel():
 # Function to calculate the total price
 def calculate_total():
     # Get the values from the price and quantity spinboxes
-    pattern = re.compile(r"^\d+(\.\d+)?$")
+    pattern = re.compile(r"^/d+(/./d+)?$")
 
     price_value_str = price_spinbox.get()
     quantity_value_str = quantity_spinbox.get()
@@ -98,7 +98,7 @@ main_window = tk.Tk()
 main_window.title("Book Management")
 
 window_icon_image = tk.PhotoImage(
-    file="C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Lab-6/Book-Management-App/assets/BookStoreIcon.png")
+    file="C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Mini-Project/Book-Management-App/assets/BookStoreIcon.png")
 main_window.iconphoto(False, window_icon_image)
 
 # Configure the main window size and position
@@ -190,7 +190,7 @@ img_container.place(x=990, y=20, width=150, height=200)
 
 # set default cover image
 img = Image.open(
-    "C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Lab-6/Book-Management-App/assets/byDefaultCover.jpg")
+    "C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Mini-Project/Book-Management-App/assets/byDefaultCover.jpg")
 img = img.resize((150, 200), reducing_gap=Image.LANCZOS)
 img = ImageTk.PhotoImage(img)
 img_container.image = img
