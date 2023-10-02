@@ -12,9 +12,8 @@ books = []
 
 def choose_cover():
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+    
     if file_path:
-        # You can display the selected image on the button or elsewhere in your UI.
-        print(f"Selected image: {file_path}")
         img_cover = Image.open(file_path)
         img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
         img_cover = ImageTk.PhotoImage(img_cover)
@@ -97,8 +96,7 @@ def calculate_total():
 main_window = tk.Tk()
 main_window.title("Book Management")
 
-window_icon_image = tk.PhotoImage(
-    file="C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Mini-Project/Book-Management-App/assets/BookStoreIcon.png")
+window_icon_image = tk.PhotoImage(file="./assets/BookStoreIcon.png")
 main_window.iconphoto(False, window_icon_image)
 
 # Configure the main window size and position
@@ -118,7 +116,7 @@ text_filed_font = ("Fira Code", 12, "normal")
 admin_label = tk.Label(main_window, text="Admin Panel", font=title_font, bg="#165d95", fg="white")
 admin_label.place(x=screen_width / 2 - 100, y=20)
 
-# ---- First Frame  : Form ---- #
+# ---- 1) First Frame  : Form ---- #
 
 # Maintain Book section (Heading)
 tk.Label(main_window, text="--- Maintain Book ---", font=section_font, bg="#165d95", fg="white").place(x=200, y=50)
@@ -148,6 +146,7 @@ while i < len(labels):
 price_label = tk.Label(form_frame, text="Book Price", font=label_font, bg="#60cb5f", fg="black")
 price_label.place(x=20, y=j * 50 + 20)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=8, command=calculate_total, font=text_filed_font)
+price_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
 price_spinbox.place(x=120, y=j * 50 + 20, height=30)
 price_spinbox.delete(0, "end")  # Set initial price to 0
 price_spinbox.insert(0, "0")
@@ -155,13 +154,10 @@ price_spinbox.insert(0, "0")
 quantity_label = tk.Label(form_frame, text="Book Quantity", font=label_font, bg="#60cb5f", fg="black")
 quantity_label.place(x=260, y=j * 50 + 20)
 quantity_spinbox = tk.Spinbox(form_frame, from_=0, to=999, width=8, command=calculate_total, font=text_filed_font)
+quantity_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
 quantity_spinbox.place(x=390, y=j * 50 + 20, height=30)
 quantity_spinbox.delete(0, "end")  # Set initial quantity to 0
 quantity_spinbox.insert(0, "0")
-
-# Bind KeyRelease event to the price and quantity Spinboxes
-price_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
-quantity_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
 
 total_label = tk.Label(form_frame, text="Total Cost", font=label_font, bg="#60cb5f", fg="black")
 total_label.place(x=500, y=j * 50 + 20)
@@ -171,37 +167,41 @@ total_entry.config(state="readonly")  # Disable editing
 total_entry.place(x=660, y=j * 50 + 20, width=300, height=30)
 
 # Action Buttons (4 buttons)
-add_button = tk.Button(form_frame, width=15, text="Add", command=add_book, font=button_font, bg="#165d95", fg="white")
-update_button = tk.Button(form_frame, width=15, text="Update", command=update_book, font=button_font, bg="#165d95",
-                          fg="white")
-delete_button = tk.Button(form_frame, width=15, text="Delete", command=delete_book, font=button_font, bg="#165d95",
-                          fg="white")
-cancel_button = tk.Button(form_frame, width=15, text="Cancel", command=cancel, font=button_font, bg="#165d95",
-                          fg="white")
 
-add_button.place(x=180, y=(j + 2) * 45 + 20, height=30)
-update_button.place(x=360, y=(j + 2) * 45 + 20, height=30)
-delete_button.place(x=540, y=(j + 2) * 45 + 20, height=30)
-cancel_button.place(x=720, y=(j + 2) * 45 + 20, height=30)
+add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
+add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=add_book,font=button_font, bg="#165d95", fg="white")
+
+update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
+update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=update_book, font=button_font, bg="#165d95", fg="white")
+
+delete_btn_icon = tk.PhotoImage(file="./assets/deleteIcon.png")
+delete_button = tk.Button(form_frame, width=150, text="Delete", image=delete_btn_icon, compound=tk.LEFT,command=delete_book, font=button_font, bg="#165d95",fg="white")
+
+cancel_btn_icon = tk.PhotoImage(file="./assets/cancelIcon.png")
+cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=cancel,font=button_font, bg="#165d95",fg="white")
+
+add_button.place(x=180, y=(j + 2) * 45 + 20, height=40)
+update_button.place(x=360, y=(j + 2) * 45 + 20, height=40)
+delete_button.place(x=540, y=(j + 2) * 45 + 20, height=40)
+cancel_button.place(x=720, y=(j + 2) * 45 + 20, height=40)
 
 # Cover selection and display area
 img_container = tk.Label(form_frame, relief="solid", borderwidth=2)
 img_container.place(x=990, y=20, width=150, height=200)
 
 # set default cover image
-img = Image.open(
-    "C:/Users/abdea/Desktop/Study/Sem 7/Python/Labs/Mini-Project/Book-Management-App/assets/byDefaultCover.jpg")
+img = Image.open("./assets/byDefaultCover.jpg")
 img = img.resize((150, 200), reducing_gap=Image.LANCZOS)
 img = ImageTk.PhotoImage(img)
 img_container.image = img
 img_container['image'] = img
 
 # select cover Image Button
-image_button = tk.Button(form_frame, width=15, text="Choose Cover", command=choose_cover, font=button_font,
-                         bg="#165d95", fg="white")
-image_button.place(x=980, y=250, height=30)
+choose_cover_btn_icon = tk.PhotoImage(file="./assets/browseIcon.png")
+choose_cover_btn = tk.Button(form_frame, width=150, text="Choose Cover", image=choose_cover_btn_icon, compound=tk.LEFT, command=choose_cover, font=button_font, bg="#165d95", fg="white")
+choose_cover_btn.place(x=980, y=250, height=35)
 
-# ---- Second Frame  : Filter frame ---- #
+# ---- 2) Second Frame  : Filter frame ---- #
 
 # Filter Book (Heading)
 tk.Label(main_window, text="--- Filter Book ---", font=section_font, bg="#165d95", fg="white").place(x=200, y=410)
@@ -213,8 +213,7 @@ filter_frame.place(x=400, y=440)
 # Dropdown for search criteria
 search_criteria = tk.StringVar()
 search_criteria.set("Id")  # Default search criteria
-search_dropdown = ttk.Combobox(filter_frame, textvariable=search_criteria, state="readonly",
-                               values=["Id", "Book Name", "Publication", "Book Subject"], font=label_font)
+search_dropdown = ttk.Combobox(filter_frame, textvariable=search_criteria, state="readonly", values=["Id", "Book Name", "Publication", "Book Subject"], font=label_font)
 search_dropdown.place(x=20, y=20, width=150, height=30)
 
 # Input field for search text
@@ -222,7 +221,8 @@ search_text = tk.Entry(filter_frame, font=text_filed_font)
 search_text.place(x=185, y=20, width=300, height=30)
 
 # Search Button
-search_button = tk.Button(filter_frame, text="Search", command=search_books, font=button_font, bg="#165d95", fg="white")
+search_btn_icon = tk.PhotoImage(file="./assets/searchIcon.png")
+search_button = tk.Button(filter_frame, text="Search", image=search_btn_icon,compound=tk.LEFT, command=search_books, font=button_font, bg="#165d95", fg="white")
 search_button.place(x=500, y=20, width=250, height=30)
 
 # ---- Third Frame  : Table frame ---- #
@@ -235,8 +235,7 @@ table_frame = tk.Frame(main_window)
 table_frame.place(x=200, y=570, width=screen_width - 400, height=250)
 
 # Create a Treeview widget to display the table
-columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication", "Book Price",
-           "Book Quantity", "Total Cost")
+columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication", "Book Price", "Book Quantity", "Total Cost")
 table = ttk.Treeview(table_frame, columns=columns, show="headings")
 
 # Add headings to the table
