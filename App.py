@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
+from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 import re
 import random
@@ -128,43 +129,83 @@ form_frame.place(x=200, y=80)
 # Labels and Entry Widgets (Total : 6)
 labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
 
-i = 0
-j = 0
+style = ttk.Style(form_frame)
+style.theme_use('clam')  # Theme to be changed # alt , classic, clam
 
-while i < len(labels):
-    tk.Label(form_frame, text=labels[i], font=label_font, bg="#60cb5f", fg="black").place(x=20, y=j * 50 + 20)
-    tk.Entry(form_frame, font=text_filed_font).place(x=180, y=j * 50 + 20, width=300, height=30)
+style.configure('my.DateEntry',
+                fieldbackground='white',
+                background='dark green',
+                foreground='dark blue',
+                arrowcolor='black',
+                )
 
-    i += 1
-    tk.Label(form_frame, text=labels[i], font=label_font, bg="#60cb5f", fg="black").place(x=500, y=j * 50 + 20)
-    tk.Entry(form_frame, font=text_filed_font).place(x=660, y=j * 50 + 20, width=300, height=30)
+# Create a separate DateEntry widget
+date_entry_var = tk.StringVar()  # declaring string variable
+date_entry = DateEntry(form_frame, style='my.DateEntry', selectmode='day', textvariable=date_entry_var,
+                       date_pattern="dd/mm/yyyy")
 
-    i += 1
-    j += 1
+# Label and Entry for Book ID
+label_book_id = tk.Label(form_frame, text=labels[0], font=label_font, bg="#60cb5f", fg="black")
+entry_book_id = tk.Entry(form_frame, font=text_filed_font)
+
+# Label and Entry for Book Name
+label_book_name = tk.Label(form_frame, text=labels[1], font=label_font, bg="#60cb5f", fg="black")
+entry_book_name = tk.Entry(form_frame, font=text_filed_font)
+
+# Label and Entry for Book Subject
+label_book_subject = tk.Label(form_frame, text=labels[2], font=label_font, bg="#60cb5f", fg="black")
+entry_book_subject = tk.Entry(form_frame, font=text_filed_font)
+
+# Label and Entry for Author Name
+label_author_name = tk.Label(form_frame, text=labels[3], font=label_font, bg="#60cb5f", fg="black")
+entry_author_name = tk.Entry(form_frame, font=text_filed_font)
+
+# Label and Entry for Publication
+label_publication = tk.Label(form_frame, text=labels[4], font=label_font, bg="#60cb5f", fg="black")
+entry_publication = tk.Entry(form_frame, font=text_filed_font)
+
+# Place labels and entries
+label_book_id.place(x=20, y=20)
+entry_book_id.place(x=180, y=20, width=300, height=30)
+
+label_book_name.place(x=20, y=70)
+entry_book_name.place(x=180, y=70, width=300, height=30)
+
+label_book_subject.place(x=500, y=20)
+entry_book_subject.place(x=660, y=20, width=300, height=30)
+
+label_author_name.place(x=500, y=70)
+entry_author_name.place(x=660, y=70, width=300, height=30)
+
+label_publication.place(x=20, y=120)
+entry_publication.place(x=180, y=120, width=300, height=30)
+
+# Place the DateEntry widget
+date_entry.place(x=660, y=120, width=300, height=30)
 
 # Price, Quantity, and Total (Total 3)
 price_label = tk.Label(form_frame, text="Book Price", font=label_font, bg="#60cb5f", fg="black")
-price_label.place(x=20, y=j * 50 + 20)
+price_label.place(x=20, y=170)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=8, command=calculate_total, font=text_filed_font)
 price_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
-price_spinbox.place(x=120, y=j * 50 + 20, height=30)
+price_spinbox.place(x=120, y=170, height=30)
 price_spinbox.delete(0, "end")  # Set initial price to 0
 price_spinbox.insert(0, "0")
 
 quantity_label = tk.Label(form_frame, text="Book Quantity", font=label_font, bg="#60cb5f", fg="black")
-quantity_label.place(x=260, y=j * 50 + 20)
+quantity_label.place(x=260, y=170)
 quantity_spinbox = tk.Spinbox(form_frame, from_=0, to=999, width=8, command=calculate_total, font=text_filed_font)
 quantity_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
-quantity_spinbox.place(x=390, y=j * 50 + 20, height=30)
+quantity_spinbox.place(x=390, y=170, height=30)
 quantity_spinbox.delete(0, "end")  # Set initial quantity to 0
 quantity_spinbox.insert(0, "0")
 
 total_label = tk.Label(form_frame, text="Total Cost", font=label_font, bg="#60cb5f", fg="black")
-total_label.place(x=500, y=j * 50 + 20)
+total_label.place(x=500, y=170)
 total_entry = tk.Entry(form_frame, font=text_filed_font)
 total_entry.insert(0, "0.00")
 total_entry.config(state="readonly")  # Disable editing
-total_entry.place(x=660, y=j * 50 + 20, width=300, height=30)
+total_entry.place(x=660, y=170, width=300, height=30)
 
 # Action Buttons (4 buttons)
 
@@ -180,10 +221,10 @@ delete_button = tk.Button(form_frame, width=150, text="Delete", image=delete_btn
 cancel_btn_icon = tk.PhotoImage(file="./assets/cancelIcon.png")
 cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=cancel,font=button_font, bg="#165d95",fg="white")
 
-add_button.place(x=180, y=(j + 2) * 45 + 20, height=40)
-update_button.place(x=360, y=(j + 2) * 45 + 20, height=40)
-delete_button.place(x=540, y=(j + 2) * 45 + 20, height=40)
-cancel_button.place(x=720, y=(j + 2) * 45 + 20, height=40)
+add_button.place(x=180, y=245, height=40)
+update_button.place(x=360, y=245, height=40)
+delete_button.place(x=540, y=245, height=40)
+cancel_button.place(x=720, y=245, height=40)
 
 # Cover selection and display area
 img_container = tk.Label(form_frame, relief="solid", borderwidth=2)
