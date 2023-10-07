@@ -129,61 +129,56 @@ form_frame.place(x=200, y=80)
 # Labels and Entry Widgets (Total : 6)
 labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
 
-style = ttk.Style(form_frame)
-style.theme_use('clam')  # Theme to be changed # alt , classic, clam
-
-style.configure('my.DateEntry',
-                fieldbackground='white',
-                background='dark green',
-                foreground='dark blue',
-                arrowcolor='black',
-                )
-
-# Create a separate DateEntry widget
-date_entry_var = tk.StringVar()  # declaring string variable
-date_entry = DateEntry(form_frame, style='my.DateEntry', selectmode='day', textvariable=date_entry_var,
-                       date_pattern="dd/mm/yyyy")
 
 # Label and Entry for Book ID
 label_book_id = tk.Label(form_frame, text=labels[0], font=label_font, bg="#60cb5f", fg="black")
+label_book_id.place(x=20, y=20)
+
 entry_book_id = tk.Entry(form_frame, font=text_filed_font)
+entry_book_id.place(x=180, y=20, width=300, height=30)
 
 # Label and Entry for Book Name
 label_book_name = tk.Label(form_frame, text=labels[1], font=label_font, bg="#60cb5f", fg="black")
+label_book_name.place(x=20, y=70)
+
 entry_book_name = tk.Entry(form_frame, font=text_filed_font)
+entry_book_name.place(x=180, y=70, width=300, height=30)
 
 # Label and Entry for Book Subject
 label_book_subject = tk.Label(form_frame, text=labels[2], font=label_font, bg="#60cb5f", fg="black")
+label_book_subject.place(x=500, y=20)
+
 entry_book_subject = tk.Entry(form_frame, font=text_filed_font)
+entry_book_subject.place(x=660, y=20, width=300, height=30)
 
 # Label and Entry for Author Name
 label_author_name = tk.Label(form_frame, text=labels[3], font=label_font, bg="#60cb5f", fg="black")
+label_author_name.place(x=500, y=70)
+
 entry_author_name = tk.Entry(form_frame, font=text_filed_font)
+entry_author_name.place(x=660, y=70, width=300, height=30)
 
 # Label and Entry for Publication
 label_publication = tk.Label(form_frame, text=labels[4], font=label_font, bg="#60cb5f", fg="black")
 entry_publication = tk.Entry(form_frame, font=text_filed_font)
 
-# Place labels and entries
-label_book_id.place(x=20, y=20)
-entry_book_id.place(x=180, y=20, width=300, height=30)
-
-label_book_name.place(x=20, y=70)
-entry_book_name.place(x=180, y=70, width=300, height=30)
-
-label_book_subject.place(x=500, y=20)
-entry_book_subject.place(x=660, y=20, width=300, height=30)
-
-label_author_name.place(x=500, y=70)
-entry_author_name.place(x=660, y=70, width=300, height=30)
-
 label_publication.place(x=20, y=120)
 entry_publication.place(x=180, y=120, width=300, height=30)
 
-# Place the DateEntry widget
+# Label and the DateEntry widget
+
+label_date = tk.Label(form_frame, text=labels[5], font=label_font, bg="#60cb5f", fg="black")
+label_date.place(x=500, y=120)
+
+style = ttk.Style(form_frame)
+style.theme_use('clam')  # Theme to be changed # alt , classic, clam
+style.configure('my.DateEntry',fieldbackground='white',background='#165d95',foreground='black',arrowcolor='black')
+
+# Create a separate DateEntry widget
+date_entry = DateEntry(form_frame, style='my.DateEntry', selectmode='day',date_pattern="dd/mm/yyyy",font=text_filed_font)
 date_entry.place(x=660, y=120, width=300, height=30)
 
-# Price, Quantity, and Total (Total 3)
+# <---- Price, Quantity, and Total (Total 3) ---->
 price_label = tk.Label(form_frame, text="Book Price", font=label_font, bg="#60cb5f", fg="black")
 price_label.place(x=20, y=170)
 price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=8, command=calculate_total, font=text_filed_font)
