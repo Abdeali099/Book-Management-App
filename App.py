@@ -129,7 +129,6 @@ form_frame.place(x=200, y=80)
 # Labels and Entry Widgets (Total : 6)
 labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
 
-
 # Label and Entry for Book ID
 label_book_id = tk.Label(form_frame, text=labels[0], font=label_font, bg="#60cb5f", fg="black")
 label_book_id.place(x=20, y=20)
@@ -176,6 +175,7 @@ style.configure('my.DateEntry',fieldbackground='white',background='#165d95',fore
 
 # Create a separate DateEntry widget
 date_entry = DateEntry(form_frame, style='my.DateEntry', selectmode='day',date_pattern="dd/mm/yyyy",font=text_filed_font)
+date_entry.config(state="readonly")  # Disable editing
 date_entry.place(x=660, y=120, width=300, height=30)
 
 # <---- Price, Quantity, and Total (Total 3) ---->
@@ -277,7 +277,7 @@ table = ttk.Treeview(table_frame, columns=columns, show="headings")
 # Add headings to the table
 for col in columns:
     table.heading(col, text=col)
-    table.column(col, width=80)
+    table.column(col, width=80,anchor=tk.CENTER)
 
 # Add a vertical scrollbar
 table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
