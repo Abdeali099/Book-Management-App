@@ -97,6 +97,9 @@ def calculate_total():
 main_window = tk.Tk()
 main_window.title("Book Management")
 
+style = ttk.Style(main_window)
+style.theme_use('clam')  # Theme to be changed # alt , classic, clam
+
 window_icon_image = tk.PhotoImage(file="./assets/BookStoreIcon.png")
 main_window.iconphoto(False, window_icon_image)
 
@@ -109,6 +112,7 @@ main_window['background'] = '#165d95'
 # Different types of font for different element
 title_font = ("Arial", 24, "bold")
 section_font = ("Fira Code", 12, "bold")
+table_heading_font = ("Fira Code", 10, "bold")
 label_font = ("Arial", 12, "bold")
 button_font = ("Arial", 12, "bold")
 text_filed_font = ("Fira Code", 12, "normal")
@@ -127,7 +131,7 @@ form_frame = tk.Frame(main_window, width=screen_width - 400, height=300, bg="#60
 form_frame.place(x=200, y=80)
 
 # Labels and Entry Widgets (Total : 6)
-labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication"]
+labels = ["Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date"]
 
 # Label and Entry for Book ID
 label_book_id = tk.Label(form_frame, text=labels[0], font=label_font, bg="#60cb5f", fg="black")
@@ -169,8 +173,6 @@ entry_publication.place(x=180, y=120, width=300, height=30)
 label_date = tk.Label(form_frame, text=labels[5], font=label_font, bg="#60cb5f", fg="black")
 label_date.place(x=500, y=120)
 
-style = ttk.Style(form_frame)
-style.theme_use('clam')  # Theme to be changed # alt , classic, clam
 style.configure('my.DateEntry',fieldbackground='white',background='#165d95',foreground='black',arrowcolor='black')
 
 # Create a separate DateEntry widget
@@ -270,8 +272,11 @@ tk.Label(main_window, text="--- Available Book ---", font=section_font, bg="#165
 table_frame = tk.Frame(main_window)
 table_frame.place(x=200, y=570, width=screen_width - 400, height=250)
 
+# style for table
+style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
+
 # Create a Treeview widget to display the table
-columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Date of Publication", "Book Price", "Book Quantity", "Total Cost")
+columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date", "Book Price", "Book Quantity", "Total Cost")
 table = ttk.Treeview(table_frame, columns=columns, show="headings")
 
 # Add headings to the table
