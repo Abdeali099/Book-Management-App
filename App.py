@@ -1,16 +1,16 @@
-from datetime import date
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
+from datetime import date
 import re
 import random
 import string
 
 
-# ----- Variables ------- #
+# <----- Variables -------> #
 
 # Sample data store for books
 books = []
@@ -61,12 +61,7 @@ def populate_table():
         table.insert("", "end",tags=(tag,) , values=(book_id, book_name, book_subject, author_name, publication,date_of_publication, book_price, book_quantity, total_cost))
 
 
-def cancel():
-    # Add code to clear the input fields.
-    pass
-
-
-# ---- Helper Functions | Functionality ---- #
+# <----------- Helper Functions | Functionality -----------> #
 
 # def is_inputs_valid() -> bool:
 #     global input_data
@@ -109,13 +104,24 @@ def set_book_cover(default=False):
         img_container['image'] = img_cover
 
 
-def clear_input_fields():
+def show_confirmation(msg="Are you sure , you want to proceed??"):
     
-    """_summary_
+    result = messagebox.askyesno("Confirmation", msg)
+    return result
+        
+def clear_input_fields(confirmation=False):
+    
+    """
     This function clear the input fields and set initial value of some entries.
     Use also as "Cancel"
     """
     
+    if confirmation :
+        do_clear=show_confirmation("Are you sure to clear fields?")
+        
+        if not do_clear:
+            return
+        
     entry_book_id.delete(0, tk.END)
     entry_book_name.delete(0, tk.END)
     entry_book_subject.delete(0, tk.END)
@@ -124,16 +130,16 @@ def clear_input_fields():
     
     date_entry.set_date(date.today())
     
-    price_spinbox.delete(0,tk.END)  # Set initial price to 0
+    price_spinbox.delete(0,tk.END)  
     price_spinbox.insert(0, "0.00")
     
-    quantity_spinbox.delete(0, tk.END)  # Set initial quantity to 0
+    quantity_spinbox.delete(0, tk.END)  
     quantity_spinbox.insert(0, "0")
     
-    total_entry.config(state="normal")  # Enable editing
-    total_entry.delete(0, tk.END)  # Set initial quantity to 0
+    total_entry.config(state="normal")  
+    total_entry.delete(0, tk.END)  
     total_entry.insert(0, "0.00")
-    total_entry.config(state="readonly")  # Read only state
+    total_entry.config(state="readonly") 
     
     set_book_cover(default=True)
     
@@ -173,7 +179,7 @@ main_window = tk.Tk()
 main_window.title("Book Management")
 
 style = ttk.Style(main_window)
-style.theme_use('clam')  # Theme to be changed # alt , classic, clam
+style.theme_use('clam')  
 
 window_icon_image = tk.PhotoImage(file="./assets/BookStoreIcon.png")
 main_window.iconphoto(False, window_icon_image)
@@ -291,7 +297,7 @@ delete_btn_icon = tk.PhotoImage(file="./assets/deleteIcon.png")
 delete_button = tk.Button(form_frame, width=150, text="Delete", image=delete_btn_icon, compound=tk.LEFT,command=delete_book, font=button_font, bg="#165d95",fg="white")
 
 cancel_btn_icon = tk.PhotoImage(file="./assets/cancelIcon.png")
-cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=clear_input_fields,font=button_font, bg="#165d95",fg="white")
+cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=lambda : clear_input_fields(confirmation=True),font=button_font, bg="#165d95",fg="white")
 
 add_button.place(x=180, y=245, height=40)
 update_button.place(x=360, y=245, height=40)
