@@ -49,7 +49,7 @@ def search_books():
 
 # Function to populate the table with random data
 def populate_table():
-    for _ in range(5):
+    for i in range(5):
         book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         book_name = ''.join(random.choices(string.ascii_letters, k=10))
         book_subject = ''.join(random.choices(string.ascii_letters, k=8))
@@ -60,8 +60,9 @@ def populate_table():
         book_quantity = 0  # Set initial quantity to 0
         total_cost = book_price * book_quantity
 
-        table.insert("", "end", values=(book_id, book_name, book_subject, author_name, publication,
-                                        date_of_publication, book_price, book_quantity, total_cost))
+        tag="odd_row" if i%2==0 else "even_row"
+        
+        table.insert("", "end",tags=(tag,) , values=(book_id, book_name, book_subject, author_name, publication,date_of_publication, book_price, book_quantity, total_cost))
 
 
 def cancel():
@@ -271,9 +272,7 @@ tk.Label(main_window, text="--- Available Book ---", font=section_font, bg="#165
 # Third Frame (Table)
 table_frame = tk.Frame(main_window)
 table_frame.place(x=200, y=570, width=screen_width - 400, height=250)
-
-# style for table
-style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
+ 
 
 # Create a Treeview widget to display the table
 columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date", "Book Price", "Book Quantity", "Total Cost")
@@ -290,6 +289,12 @@ table.configure(yscrollcommand=table_scrollbar.set)
 table_scrollbar.pack(side="right", fill="y")
 
 table.pack(fill="both", expand=True)
+
+# style for table 
+style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
+style.configure('Treeview',font=text_filed_font)
+table.tag_configure("even_row", background="white")  # or any other light color
+table.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 
 # Populate the table with random data
 populate_table()
