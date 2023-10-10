@@ -7,9 +7,14 @@ import re
 import random
 import string
 
+
+# ----- Variables ------- #
+
 # Sample data store for books
 books = []
 
+pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
+pattern_natural_number = re.compile(r"^\d?$")
 
 def choose_cover():
     file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
@@ -73,12 +78,12 @@ def cancel():
 # Function to calculate the total price
 def calculate_total():
     # Get the values from the price and quantity spinboxes
-    pattern = re.compile(r"^/d+(/./d+)?$")
 
-    price_value_str = price_spinbox.get()
-    quantity_value_str = quantity_spinbox.get()
+    price_value_str =price_spinbox.get()
+    quantity_value_str =quantity_spinbox.get()
 
-    if pattern.fullmatch(price_value_str) and pattern.fullmatch(quantity_value_str):
+    if pattern_real_number.fullmatch(price_value_str) and pattern_natural_number.fullmatch(quantity_value_str):
+        
         price = float(price_spinbox.get())
         quantity = int(quantity_spinbox.get())
 
