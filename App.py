@@ -1,5 +1,7 @@
+from datetime import date
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
@@ -75,6 +77,49 @@ def cancel():
     pass
 
 
+# ---- Helper Functions | Functionality ---- #
+
+# def is_inputs_valid() -> bool:
+#     global input_data
+
+#     try:
+#         new_id = int(entry_id.get())
+
+#         input_data = [new_id, entry_hostname.get(), entry_brand.get(), entry_ram.get(),
+#                       entry_flash.get()]
+
+#         if '' in input_data:
+#             messagebox.showerror('Error', 'Please provide proper inputs')
+#             return False
+
+#     except Exception as e:
+#         print("Value error in selection : ", e)
+#         messagebox.showerror('Error', 'Please provide proper inputs')
+#         return False
+
+#     return True
+
+
+def clear_input_fields():
+    
+    entry_book_id.delete(0, tk.END)
+    entry_book_name.delete(0, tk.END)
+    entry_book_subject.delete(0, tk.END)
+    entry_author_name.delete(0, tk.END)
+    entry_publication.delete(0, tk.END)
+    date_entry.set_date(date.today())
+    
+    price_spinbox.delete(0,tk.END)  # Set initial price to 0
+    price_spinbox.insert(0, "0.00")
+    
+    quantity_spinbox.delete(0, tk.END)  # Set initial quantity to 0
+    quantity_spinbox.insert(0, "0")
+    
+    total_entry.config(state="normal")  # Enable editing
+    total_entry.delete(0, tk.END)  # Set initial quantity to 0
+    total_entry.insert(0, "0.00")
+    total_entry.config(state="readonly")  # Read only state
+    
 # Function to calculate the total price
 def calculate_total():
     # Get the values from the price and quantity spinboxes
@@ -193,7 +238,7 @@ price_spinbox = tk.Spinbox(form_frame, from_=0, to=999999, width=8, command=calc
 price_spinbox.bind("<KeyRelease>", lambda event: calculate_total())
 price_spinbox.place(x=120, y=170, height=30)
 price_spinbox.delete(0, "end")  # Set initial price to 0
-price_spinbox.insert(0, "0")
+price_spinbox.insert(0, "0.00")
 
 quantity_label = tk.Label(form_frame, text="Book Quantity", font=label_font, bg="#60cb5f", fg="black")
 quantity_label.place(x=260, y=170)
@@ -222,7 +267,7 @@ delete_btn_icon = tk.PhotoImage(file="./assets/deleteIcon.png")
 delete_button = tk.Button(form_frame, width=150, text="Delete", image=delete_btn_icon, compound=tk.LEFT,command=delete_book, font=button_font, bg="#165d95",fg="white")
 
 cancel_btn_icon = tk.PhotoImage(file="./assets/cancelIcon.png")
-cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=cancel,font=button_font, bg="#165d95",fg="white")
+cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=clear_input_fields,font=button_font, bg="#165d95",fg="white")
 
 add_button.place(x=180, y=245, height=40)
 update_button.place(x=360, y=245, height=40)
