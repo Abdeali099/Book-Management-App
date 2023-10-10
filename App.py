@@ -18,17 +18,6 @@ books = []
 pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
 
-def choose_cover():
-    file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-    
-    if file_path:
-        img_cover = Image.open(file_path)
-        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
-        img_cover = ImageTk.PhotoImage(img_cover)
-        img_container.image = img_cover
-        img_container['image'] = img_cover
-
-
 # Function to add a book to the data store
 def add_book():
     # Add code to handle adding a book to the data store.
@@ -99,14 +88,40 @@ def cancel():
 
 #     return True
 
+def set_book_cover(default=False):
+    
+    """_summary_
+    -> Set book cover image to label.
+    -> If default is False user have to choose path
+    """
+    
+    if not default : 
+        file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+    
+    else :
+        file_path = "./assets/byDefaultCover.jpg"
+    
+    if file_path:
+        img_cover = Image.open(file_path)
+        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
+        img_cover = ImageTk.PhotoImage(img_cover)
+        img_container.image = img_cover
+        img_container['image'] = img_cover
+
 
 def clear_input_fields():
+    
+    """_summary_
+    This function clear the input fields and set initial value of some entries.
+    Use also as "Cancel"
+    """
     
     entry_book_id.delete(0, tk.END)
     entry_book_name.delete(0, tk.END)
     entry_book_subject.delete(0, tk.END)
     entry_author_name.delete(0, tk.END)
     entry_publication.delete(0, tk.END)
+    
     date_entry.set_date(date.today())
     
     price_spinbox.delete(0,tk.END)  # Set initial price to 0
@@ -120,27 +135,36 @@ def clear_input_fields():
     total_entry.insert(0, "0.00")
     total_entry.config(state="readonly")  # Read only state
     
-# Function to calculate the total price
+    set_book_cover(default=True)
+    
 def calculate_total():
-    # Get the values from the price and quantity spinboxes
+    
+    """_summary_
+    this function calls whenever price or quantity changes and calcluate total and set it.
+    """
+    
+    try:
+        # Get the values from the price and quantity spinboxes
+        price_value_str =price_spinbox.get()
+        quantity_value_str =quantity_spinbox.get()
 
-    price_value_str =price_spinbox.get()
-    quantity_value_str =quantity_spinbox.get()
+        if pattern_real_number.fullmatch(price_value_str) and pattern_natural_number.fullmatch(quantity_value_str):
+            
+            price = float(price_spinbox.get())
+            quantity = int(quantity_spinbox.get())
 
-    if pattern_real_number.fullmatch(price_value_str) and pattern_natural_number.fullmatch(quantity_value_str):
-        
-        price = float(price_spinbox.get())
-        quantity = int(quantity_spinbox.get())
+            # Calculate the total cost
+            total_cost = price * quantity
 
-        # Calculate the total cost
-        total_cost = price * quantity
+            # Update the total cost entry field
+            total_entry.config(state="normal")  # Enable editing
+            total_entry.delete(0, "end")  # Clear previous value
+            total_entry.insert(0, f"{total_cost:.2f}")  # Insert the new total cost
+            total_entry.config(state="readonly")  # Disable editing
 
-        # Update the total cost entry field
-        total_entry.config(state="normal")  # Enable editing
-        total_entry.delete(0, "end")  # Clear previous value
-        total_entry.insert(0, f"{total_cost:.2f}")  # Insert the new total cost
-        total_entry.config(state="readonly")  # Disable editing
-
+    except Exception as e :
+        messagebox.showerror('Error', 'Provide proper value of price or quantity')
+        print("Error in reading price | quantity : ",e)
 
 # -------------------------- GUI Application -------------------------- #
 
@@ -279,15 +303,11 @@ img_container = tk.Label(form_frame, relief="solid", borderwidth=2)
 img_container.place(x=990, y=20, width=150, height=200)
 
 # set default cover image
-img = Image.open("./assets/byDefaultCover.jpg")
-img = img.resize((150, 200), reducing_gap=Image.LANCZOS)
-img = ImageTk.PhotoImage(img)
-img_container.image = img
-img_container['image'] = img
+set_book_cover(default=True)
 
 # select cover Image Button
 choose_cover_btn_icon = tk.PhotoImage(file="./assets/browseIcon.png")
-choose_cover_btn = tk.Button(form_frame, width=150, text="Choose Cover", image=choose_cover_btn_icon, compound=tk.LEFT, command=choose_cover, font=button_font, bg="#165d95", fg="white")
+choose_cover_btn = tk.Button(form_frame, width=150, text="Choose Cover", image=choose_cover_btn_icon, compound=tk.LEFT, command=set_book_cover, font=button_font, bg="#165d95", fg="white")
 choose_cover_btn.place(x=980, y=250, height=35)
 
 # ---- 2) Second Frame  : Filter frame ---- #
