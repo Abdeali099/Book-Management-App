@@ -13,7 +13,7 @@ import string
 # <----- Variables -------> #
 
 # Sample data store for books
-books = []
+input_books_data= []
 
 pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
@@ -83,11 +83,40 @@ def populate_table():
 
 #     return True
 
+""" not working --------
+def get_input_data():
+    
+    global input_books_data
+    
+    # Retrieve data from the input fields
+    book_id = entry_book_id.get()
+    book_name = entry_book_name.get()
+    book_subject = entry_book_subject.get()
+    author_name = entry_author_name.get()
+    publication = entry_publication.get()
+    
+    date_of_publication = date_entry.get_date()
+    
+    book_price = price_spinbox.get()
+    book_quantity = quantity_spinbox.get()
+    total_cost = total_entry.get()
+    
+    input_books_data = [book_id,book_name,book_subject,author_name,publication,date_of_publication,book_price,book_quantity,total_cost]
+    
+
+    img_path = "./assets/byDefaultCover.jpg"
+    img = Image.open(img_path)
+    img = img.resize((50, 50), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
+    img1 = ImageTk.PhotoImage(img)
+    
+    table.insert("",image=img1,values=input_books_data)
+"""    
+
 def set_book_cover(default=False):
     
-    """_summary_
-    -> Set book cover image to label.
-    -> If default is False user have to choose path
+    """
+    -> Set book cover image to label. \n
+    -> If default is False user have to choose path.
     """
     
     if not default : 
@@ -103,8 +132,12 @@ def set_book_cover(default=False):
         img_container.image = img_cover
         img_container['image'] = img_cover
 
-
 def show_confirmation(msg="Are you sure , you want to proceed??"):
+    
+    """
+    -> Custom message Confirmation window. \n
+    -> Return 'True' if yes clicked , other wise 'False'
+    """
     
     result = messagebox.askyesno("Confirmation", msg)
     return result
@@ -112,8 +145,8 @@ def show_confirmation(msg="Are you sure , you want to proceed??"):
 def clear_input_fields(confirmation=False):
     
     """
-    This function clear the input fields and set initial value of some entries.
-    Use also as "Cancel"
+    -> This function clear the input fields and set initial value of some entries. \n
+    -> Use also as "Cancel".
     """
     
     if confirmation :
@@ -145,8 +178,8 @@ def clear_input_fields(confirmation=False):
     
 def calculate_total():
     
-    """_summary_
-    this function calls whenever price or quantity changes and calcluate total and set it.
+    """
+    -> This function calls whenever price or quantity changes and calcluate total and set it.
     """
     
     try:
@@ -288,7 +321,7 @@ total_entry.place(x=660, y=170, width=300, height=30)
 # Action Buttons (4 buttons)
 
 add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
-add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=add_book,font=button_font, bg="#165d95", fg="white")
+add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=get_input_data,font=button_font, bg="#165d95", fg="white")
 
 update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
 update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=update_book, font=button_font, bg="#165d95", fg="white")
@@ -343,11 +376,11 @@ search_button.place(x=500, y=20, width=250, height=30)
 # ---- Third Frame  : Table frame ---- #
 
 # Available Book (Heading)
-tk.Label(main_window, text="--- Available Book ---", font=section_font, bg="#165d95", fg="white").place(x=200, y=540)
+tk.Label(main_window, text="--- Available Book ---", font=section_font, bg="#165d95", fg="white").place(x=100, y=540)
 
 # Third Frame (Table)
 table_frame = tk.Frame(main_window)
-table_frame.place(x=200, y=570, width=screen_width - 400, height=250)
+table_frame.place(x=100, y=570, width=screen_width - 200, height=250)
  
 
 # Create a Treeview widget to display the table
@@ -373,6 +406,6 @@ table.tag_configure("even_row", background="white")  # or any other light color
 table.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 
 # Populate the table with random data
-populate_table()
+# populate_table()
 
 main_window.mainloop()
