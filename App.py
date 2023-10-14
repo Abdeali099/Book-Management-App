@@ -18,6 +18,11 @@ input_books_data= []
 pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
 
+# Global variables for images
+img1 = None
+img2 = None
+img3 = None
+
 # Function to add a book to the data store
 def add_book():
     # Add code to handle adding a book to the data store.
@@ -44,21 +49,49 @@ def search_books():
 
 
 # Function to populate the table with random data
-def populate_table():
-    for i in range(5):
-        book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-        book_name = ''.join(random.choices(string.ascii_letters, k=10))
-        book_subject = ''.join(random.choices(string.ascii_letters, k=8))
-        author_name = ''.join(random.choices(string.ascii_letters, k=8))
-        publication = ''.join(random.choices(string.ascii_letters, k=8))
-        date_of_publication = f"{random.randint(2000, 2022)}-{random.randint(1, 12)}-{random.randint(1, 28)}"
-        book_price = 0  # Set initial price to 0
-        book_quantity = 0  # Set initial quantity to 0
-        total_cost = book_price * book_quantity
+# def populate_table():
+#     # for i in range(5):
+#     #     book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+#     #     book_name = ''.join(random.choices(string.ascii_letters, k=10))
+#     #     book_subject = ''.join(random.choices(string.ascii_letters, k=8))
+#     #     author_name = ''.join(random.choices(string.ascii_letters, k=8))
+#     #     publication = ''.join(random.choices(string.ascii_letters, k=8))
+#     #     date_of_publication = f"{random.randint(2000, 2022)}-{random.randint(1, 12)}-{random.randint(1, 28)}"
+#     #     book_price = 0  # Set initial price to 0
+#     #     book_quantity = 0  # Set initial quantity to 0
+#     #     total_cost = book_price * book_quantity
 
-        tag="odd_row" if i%2==0 else "even_row"
+#     #     tag="odd_row" if i%2==0 else "even_row"
         
-        table.insert("", "end",tags=(tag,) , values=(book_id, book_name, book_subject, author_name, publication,date_of_publication, book_price, book_quantity, total_cost))
+#     img_path = "./assets/byDefaultCover.jpg"
+#     img = Image.open(img_path)
+#     img = img.resize((50, 50), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
+#     img1 = ImageTk.PhotoImage(img)
+
+#     img2 = ImageTk.PhotoImage(Image.open("./assets/addIcon.png"))
+#     img3 = ImageTk.PhotoImage(Image.open("./assets/byDefaultCover.jpg"))
+
+#     # table.insert("", "end",tags=(tag,) , values=(book_id, book_name, book_subject, author_name, publication,date_of_publication, book_price, book_quantity, total_cost))
+#     table.insert("", "end",iid='1',open=True,text="img-1",image=img1, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
+#     table.insert("", "end",iid='2',open=True,text="img-2",image=img2, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
+#     table.insert("", "end",iid='3',open=True,text="img-3",image=img3, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
+
+def populate_table():
+    global img1, img2, img3
+    
+    img_path = "./assets/byDefaultCover.jpg"
+    img = Image.open(img_path)
+    img = img.resize((80, 80), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
+    img1 = ImageTk.PhotoImage(img)
+
+    # Create a PhotoImage object for each of the images
+    img2 = ImageTk.PhotoImage(Image.open("./assets/addIcon.png"))
+    img3 = ImageTk.PhotoImage(Image.open("./assets/byDefaultCover.jpg"))
+
+    # Insert the rows into the table
+    table_data.insert("", "end", iid=1, open=True, image=img1, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
+    table_data.insert("", "end", iid=2, open=True, image=img2, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
+    table_data.insert("", "end", iid=3, open=True, image=img3, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
 
 
 # <----------- Helper Functions | Functionality -----------> #
@@ -321,7 +354,7 @@ total_entry.place(x=660, y=170, width=300, height=30)
 # Action Buttons (4 buttons)
 
 add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
-add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=get_input_data,font=button_font, bg="#165d95", fg="white")
+add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=update_book,font=button_font, bg="#165d95", fg="white")
 
 update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
 update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=update_book, font=button_font, bg="#165d95", fg="white")
@@ -382,30 +415,39 @@ tk.Label(main_window, text="--- Available Book ---", font=section_font, bg="#165
 table_frame = tk.Frame(main_window)
 table_frame.place(x=100, y=570, width=screen_width - 200, height=250)
  
+#  Create a Treeview widget to display the table
+table_data = ttk.Treeview(table_frame, selectmode ='browse',height=3)  
 
-# Create a Treeview widget to display the table
-columns = ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date", "Book Price", "Book Quantity", "Total Cost")
-table = ttk.Treeview(table_frame, columns=columns, show="headings")
+# Defining of columns
+columns =  ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date", "Book Price", "Book Quantity", "Total Cost")
+table_data["columns"] = columns
 
-# Add headings to the table
+# Defining heading
+table_data['show'] = 'tree headings'
+
+#  style for table 
+# style = ttk.Style()
+style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
+style.configure('Treeview',font=text_filed_font,rowheight=80)
+table_data.tag_configure("even_row", background="white")  # or any other light color
+table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
+
+
+table_data.heading("#0", text ="#") # Text of the column 
+table_data.column("#0", width = 50, anchor ='center') # Width of column
+
 for col in columns:
-    table.heading(col, text=col)
-    table.column(col, width=80,anchor=tk.CENTER)
-
+    table_data.heading(col, text=col)
+    table_data.column(col, width=80,anchor=tk.CENTER)
+    
 # Add a vertical scrollbar
-table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table.yview)
-table.configure(yscrollcommand=table_scrollbar.set)
+table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table_data.yview)
+table_data.configure(yscrollcommand=table_scrollbar.set)
 table_scrollbar.pack(side="right", fill="y")
 
-table.pack(fill="both", expand=True)
-
-# style for table 
-style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
-style.configure('Treeview',font=text_filed_font)
-table.tag_configure("even_row", background="white")  # or any other light color
-table.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
+table_data.pack(fill="both", expand=True)
 
 # Populate the table with random data
-# populate_table()
+populate_table()
 
 main_window.mainloop()
