@@ -6,8 +6,6 @@ from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 from datetime import date
 import re
-import random
-import string
 
 
 # <----- Variables -------> #
@@ -18,10 +16,11 @@ input_books_data= []
 pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
 
-# Global variables for images
-img1 = None
-img2 = None
-img3 = None
+# Global variables for images and its data
+book_cover_path = "./assets/byDefaultCover.jpg"
+book_cover_data = []
+default_book_cover = None
+user_selected_cover = None
 
 # Function to add a book to the data store
 def add_book():
@@ -49,51 +48,16 @@ def search_books():
 
 
 # Function to populate the table with random data
-# def populate_table():
-#     # for i in range(5):
-#     #     book_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-#     #     book_name = ''.join(random.choices(string.ascii_letters, k=10))
-#     #     book_subject = ''.join(random.choices(string.ascii_letters, k=8))
-#     #     author_name = ''.join(random.choices(string.ascii_letters, k=8))
-#     #     publication = ''.join(random.choices(string.ascii_letters, k=8))
-#     #     date_of_publication = f"{random.randint(2000, 2022)}-{random.randint(1, 12)}-{random.randint(1, 28)}"
-#     #     book_price = 0  # Set initial price to 0
-#     #     book_quantity = 0  # Set initial quantity to 0
-#     #     total_cost = book_price * book_quantity
-
-#     #     tag="odd_row" if i%2==0 else "even_row"
-        
-#     img_path = "./assets/byDefaultCover.jpg"
-#     img = Image.open(img_path)
-#     img = img.resize((50, 50), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
-#     img1 = ImageTk.PhotoImage(img)
-
-#     img2 = ImageTk.PhotoImage(Image.open("./assets/addIcon.png"))
-#     img3 = ImageTk.PhotoImage(Image.open("./assets/byDefaultCover.jpg"))
-
-#     # table.insert("", "end",tags=(tag,) , values=(book_id, book_name, book_subject, author_name, publication,date_of_publication, book_price, book_quantity, total_cost))
-#     table.insert("", "end",iid='1',open=True,text="img-1",image=img1, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
-#     table.insert("", "end",iid='2',open=True,text="img-2",image=img2, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
-#     table.insert("", "end",iid='3',open=True,text="img-3",image=img3, values=("book_id", "book_name", "book_subject", "author_name", "publication","date_of_publication", "book_price", "book_quantity", "total_cost"))
-
 def populate_table():
-    global img1, img2, img3
+    global default_book_cover
     
-    img_path = "./assets/byDefaultCover.jpg"
-    img = Image.open(img_path)
+    img = Image.open(book_cover_path)
     img = img.resize((80, 80), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
-    img1 = ImageTk.PhotoImage(img)
-
-    # Create a PhotoImage object for each of the images
-    img2 = ImageTk.PhotoImage(Image.open("./assets/addIcon.png"))
-    img3 = ImageTk.PhotoImage(Image.open("./assets/byDefaultCover.jpg"))
+    default_book_cover = ImageTk.PhotoImage(img)
 
     # Insert the rows into the table
-    table_data.insert("", "end", iid=1, open=True, image=img1, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
-    table_data.insert("", "end", iid=2, open=True, image=img2, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
-    table_data.insert("", "end", iid=3, open=True, image=img3, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
-
-
+    table_data.insert("", "end", iid=1, open=True, image=default_book_cover, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
+    
 # <----------- Helper Functions | Functionality -----------> #
 
 # def is_inputs_valid() -> bool:
@@ -116,34 +80,34 @@ def populate_table():
 
 #     return True
 
-""" not working --------
 def get_input_data():
-    
-    global input_books_data
-    
+    global input_books_data, book_cover_data
+
     # Retrieve data from the input fields
     book_id = entry_book_id.get()
     book_name = entry_book_name.get()
     book_subject = entry_book_subject.get()
     author_name = entry_author_name.get()
     publication = entry_publication.get()
-    
+
     date_of_publication = date_entry.get_date()
-    
+
     book_price = price_spinbox.get()
     book_quantity = quantity_spinbox.get()
     total_cost = total_entry.get()
-    
-    input_books_data = [book_id,book_name,book_subject,author_name,publication,date_of_publication,book_price,book_quantity,total_cost]
-    
 
-    img_path = "./assets/byDefaultCover.jpg"
-    img = Image.open(img_path)
-    img = img.resize((50, 50), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
-    img1 = ImageTk.PhotoImage(img)
+    input_books_data = [book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
+
+    img_choosen = Image.open(book_cover_path)
+    img_choosen = img_choosen.resize((80, 80), reducing_gap=Image.LANCZOS)
+    user_selected_cover = ImageTk.PhotoImage(img_choosen)
+
+    # Store the image data in a list or dictionary
+    book_cover_data.append(user_selected_cover)
+
+    # Insert data into the table
+    table_data.insert("", "end", iid=book_id, open=True, image=user_selected_cover, values=input_books_data)
     
-    table.insert("",image=img1,values=input_books_data)
-"""    
 
 def set_book_cover(default=False):
     
@@ -152,20 +116,19 @@ def set_book_cover(default=False):
     -> If default is False user have to choose path.
     """
     
+    global book_cover_path
+    
     if not default : 
-        file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-    
-    else :
-        file_path = "./assets/byDefaultCover.jpg"
-    
-    if file_path:
-        img_cover = Image.open(file_path)
+        book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+
+    if book_cover_path:
+        img_cover = Image.open(book_cover_path)
         img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
         img_cover = ImageTk.PhotoImage(img_cover)
         img_container.image = img_cover
         img_container['image'] = img_cover
 
-def show_confirmation(msg="Are you sure , you want to proceed??"):
+def get_confirmation(msg="Are you sure , you want to proceed??"):
     
     """
     -> Custom message Confirmation window. \n
@@ -183,7 +146,7 @@ def clear_input_fields(confirmation=False):
     """
     
     if confirmation :
-        do_clear=show_confirmation("Are you sure to clear fields?")
+        do_clear=get_confirmation("Are you sure to clear fields?")
         
         if not do_clear:
             return
@@ -354,7 +317,7 @@ total_entry.place(x=660, y=170, width=300, height=30)
 # Action Buttons (4 buttons)
 
 add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
-add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=update_book,font=button_font, bg="#165d95", fg="white")
+add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=get_input_data,font=button_font, bg="#165d95", fg="white")
 
 update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
 update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=update_book, font=button_font, bg="#165d95", fg="white")
@@ -426,13 +389,12 @@ table_data["columns"] = columns
 table_data['show'] = 'tree headings'
 
 #  style for table 
-# style = ttk.Style()
 style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
 style.configure('Treeview',font=text_filed_font,rowheight=80)
 table_data.tag_configure("even_row", background="white")  # or any other light color
 table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 
-
+# initilaizing heading-column
 table_data.heading("#0", text ="#") # Text of the column 
 table_data.column("#0", width = 50, anchor ='center') # Width of column
 
