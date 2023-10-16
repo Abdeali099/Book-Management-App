@@ -18,6 +18,7 @@ pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
 
 # Global variables for images and its data
+book_cover_format = ""
 book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
 book_cover_data_list = []
 default_book_cover = None
@@ -25,114 +26,132 @@ user_selected_cover = None
 
 # <----- Database handle -------> #
 
-# class Database:
+class Database:
     
-#     # Queries
+    # Queries
     
-#     insert_query = "INSERT INTO routers VALUES (?,?,?,?,?);"
-#     update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
-#     delete_query = "DELETE FROM routers WHERE id = ?;"
-#     search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
+    insert_query = "INSERT INTO books VALUES (?,?,?,?,?,?,?,?,?,?);"
+    # update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
+    # delete_query = "DELETE FROM routers WHERE id = ?;"
+    # search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
+    
+    # class objects
+    cursor=None
+    connection = None
 
-#     # run only for once
-#     def __init__(self, database_name):
+    # run only for once
+    def __init__(self, database_name):
         
-#         self.database_name = database_name
-#         self.connection = sqlite3.connect(database_name)
-#         self.cursor = self.connection.cursor()
-#         self.cursor.execute(
-#             """
-#             CREATE TABLE IF NOT EXISTS 
-#             routers (id INTEGER PRIMARY KEY, 
-#                      hostname TEXT, 
-#                      brand TEXT, 
-#                      ram Text, 
-#                      flash Text)
-#             """)
+        self.database_name = database_name
+        Database.connection = sqlite3.connect(database_name)
+        Database.cursor = Database.connection.cursor()
+        Database.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS 
+            books (id INTEGER PRIMARY KEY, 
+                     subject TEXT, 
+                     book_name TEXT, 
+                     author_name TEXT, 
+                     publication TEXT,
+                     pub_date TEXT,
+                     price REAL,
+                     quantity INTEGER,
+                     cost REAL,
+                     cover BLOB)
+            """)
 
-#         self.connection.commit()
+        Database.connection.commit()
 
-#     # Populate data at window loading / Opening
-#     def fetch_all_data(self):
+    # Populate data at window loading / Opening
+    def fetch_all_data(self):
+        pass
+        # initial_data = self.cursor.execute(Database.fetch_all_data_query)
+        # routers_data = initial_data.fetchall()
 
-#         initial_data = self.cursor.execute(Database.fetch_all_data_query)
-#         routers_data = initial_data.fetchall()
+        # if len(routers_data) != 0:
+        #     for data in routers_data:
+        #         router_tree_view.insert('', 'end', values=data)
 
-#         if len(routers_data) != 0:
-#             for data in routers_data:
-#                 router_tree_view.insert('', 'end', values=data)
+    # ---- CRUD Operation Methods (Database)  ---- #
 
-#     # ---- CRUD Operation Methods (Database)  ---- #
+    # 1 : Insert Data
+    def insert(self, valid_input_data):
 
-#     # 1 : Insert Data
-#     def insert(self, valid_input_data):
+        try:
+            # save to database
+            Database.cursor.execute(Database.insert_query, valid_input_data)
+            Database.connection.commit()
+            
+        except Exception as e:
+            print('Error in saving data : ', e)
+            messagebox.showerror('Error', 'Error in saving data,try again...')
+            return False
+            
+        return True
 
-#         try:
-#             # save to database
-#             self.cursor.execute(Database.insert_query, valid_input_data)
-#             self.connection.commit()
+    # 2 : Update Data
+    def update(self, valid_input_data):
+        pass
+        # try:
+        #     # update to database
+        #     update_values = valid_input_data[1::]
+        #     update_values.append(valid_input_data[0])
 
-#             # save to tree
-#             router_tree_view.insert('', 'end', values=valid_input_data)
+        #     self.cursor.execute(Database.update_query, update_values)
+        #     Database.connection.commit()
 
-#         except Exception as e:
-#             print('Error in saving data : ', e)
-#             messagebox.showerror('Error', 'Error in saving data,try again...')
+        #     # update tree
+        #     router_tree_view.item(selected_tree_row_index, values=valid_input_data)
 
-#     # 2 : Update Data
-#     def update(self, valid_input_data):
-#         try:
-#             # update to database
-#             update_values = valid_input_data[1::]
-#             update_values.append(valid_input_data[0])
+        # except Exception as e:
+        #     print('Error in updating data : ', e)
+        #     messagebox.showerror('Error', 'Error in updating data,try again...')
 
-#             self.cursor.execute(Database.update_query, update_values)
-#             self.connection.commit()
+    # 3 : Delete Data
+    def delete(self, delete_id):
+        
+        pass
 
-#             # update tree
-#             router_tree_view.item(selected_tree_row_index, values=valid_input_data)
+        # try:
+        #     # delete from database
+        #     self.cursor.execute(Database.delete_query, [delete_id])
+        #     Database.connection.commit()
 
-#         except Exception as e:
-#             print('Error in updating data : ', e)
-#             messagebox.showerror('Error', 'Error in updating data,try again...')
+        #     # delete temporary
+        #     router_tree_view.delete(selected_tree_row_index)
 
-#     # 3 : Delete Data
-#     def delete(self, delete_id):
+        # except Exception as e:
+        #     print('Error in deleting data : ', e)
+        #     messagebox.showerror('Error', 'Error in deleting data,try again...')
 
-#         try:
-#             # delete from database
-#             self.cursor.execute(Database.delete_query, [delete_id])
-#             self.connection.commit()
+    # 4 : search hostname
+    def search_by_hostname(self, search_hostname):
+        pass
+        
+        # initial_data = self.cursor.execute(Database.hostname_search_query, ('%' + search_hostname + '%',))
+        # routers_data = initial_data.fetchall()
 
-#             # delete temporary
-#             router_tree_view.delete(selected_tree_row_index)
+        # if len(routers_data) != 0:
+        #     for data in routers_data:
+        #         router_tree_view.insert('', 'end', values=data)
 
-#         except Exception as e:
-#             print('Error in deleting data : ', e)
-#             messagebox.showerror('Error', 'Error in deleting data,try again...')
+    def search_by_query(self, search_query):
+        pass
+    
+        # initial_data = self.cursor.execute(search_query)
+        # routers_data = initial_data.fetchall()
 
-#     # 4 : search hostname
-#     def search_by_hostname(self, search_hostname):
-#         initial_data = self.cursor.execute(Database.hostname_search_query, ('%' + search_hostname + '%',))
-#         routers_data = initial_data.fetchall()
-
-#         if len(routers_data) != 0:
-#             for data in routers_data:
-#                 router_tree_view.insert('', 'end', values=data)
-
-#     def search_by_query(self, search_query):
-#         initial_data = self.cursor.execute(search_query)
-#         routers_data = initial_data.fetchall()
-
-#         if len(routers_data) != 0:
-#             for data in routers_data:
-#                 router_tree_view.insert('', 'end', values=data)
+        # if len(routers_data) != 0:
+        #     for data in routers_data:
+        #         router_tree_view.insert('', 'end', values=data)
 
 
 # <----------- CRUD Operstion  -----------> #
 
 def add_book():
     
+    global form_input_book_data,book_cover_format
+        
     """
     -> Add code to handle adding a book to the data store. \n
     -> Retrieve data from the input fields and append it to the 'books' list.
@@ -141,9 +160,17 @@ def add_book():
     isInputValid = get_input_data()
     
     if isInputValid : 
-        table_data.insert("","end",image=form_input_book_data[0],values=form_input_book_data[1:])
-        print("Added Succesfully")
-        clear_input_fields()
+                
+        form_input_book_data.append(convertToBinaryData(book_cover_path))
+        
+        isDataAdded=database.insert(form_input_book_data[1:])
+        
+        if isDataAdded :
+            
+            # insert into table
+            table_data.insert('', 'end', image=form_input_book_data[0],values=form_input_book_data[1:-1])
+
+            clear_input_fields()
 
 
 # Function to update a book in the data store
@@ -176,6 +203,21 @@ def populate_table():
     table_data.insert("", "end",  image=default_book_cover, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
     
 # <----------- Helper Functions | Functionality -----------> #
+
+def convertToBinaryData(file_Path):
+
+    """
+    -> Convert binary format to images or files data
+    Returns:
+        _type_: Binary(BLOB)
+    """
+    
+    with open(file_Path, 'rb') as file:
+        
+        blobData = file.read()
+    
+    return blobData
+
 
 def is_inputs_valid() -> bool:
     
@@ -247,6 +289,7 @@ def get_input_data():
 
 def set_book_cover(default=False):
     
+    global book_cover_format
     """
     -> Set book cover image to label. \n
     -> If default is False user have to choose path.
@@ -261,6 +304,7 @@ def set_book_cover(default=False):
         book_cover_path=DEFAULT_BOOK_COVER_PATH
         
     img_cover = Image.open(book_cover_path)
+    book_cover_format = img_cover.format
     img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
     img_cover = ImageTk.PhotoImage(img_cover)
     img_container.image = img_cover
@@ -338,6 +382,11 @@ def calculate_total():
     except Exception as e :
         messagebox.showerror('Error', 'Provide proper value of price or quantity')
         print("Error in reading price | quantity : ",e)
+        
+        
+# -------------------- Initialize DataBase ------------------- #
+
+database = Database('Books.db')
 
 # -------------------------- GUI Application -------------------------- #
 
