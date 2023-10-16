@@ -1,32 +1,149 @@
 import tkinter as tk
+import sqlite3
+import re
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 from datetime import date
-import re
-
 
 # <----- Variables -------> #
 
 # Sample data store for books
-input_books_data= []
+form_input_book_data= []
+stored_books_data_list = []
 
 pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
 pattern_natural_number = re.compile(r"^\d?$")
 
 # Global variables for images and its data
-book_cover_path = "./assets/byDefaultCover.jpg"
-book_cover_data = []
+book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
+book_cover_data_list = []
 default_book_cover = None
 user_selected_cover = None
 
-# Function to add a book to the data store
+# <----- Database handle -------> #
+
+# class Database:
+    
+#     # Queries
+    
+#     insert_query = "INSERT INTO routers VALUES (?,?,?,?,?);"
+#     update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
+#     delete_query = "DELETE FROM routers WHERE id = ?;"
+#     search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
+
+#     # run only for once
+#     def __init__(self, database_name):
+        
+#         self.database_name = database_name
+#         self.connection = sqlite3.connect(database_name)
+#         self.cursor = self.connection.cursor()
+#         self.cursor.execute(
+#             """
+#             CREATE TABLE IF NOT EXISTS 
+#             routers (id INTEGER PRIMARY KEY, 
+#                      hostname TEXT, 
+#                      brand TEXT, 
+#                      ram Text, 
+#                      flash Text)
+#             """)
+
+#         self.connection.commit()
+
+#     # Populate data at window loading / Opening
+#     def fetch_all_data(self):
+
+#         initial_data = self.cursor.execute(Database.fetch_all_data_query)
+#         routers_data = initial_data.fetchall()
+
+#         if len(routers_data) != 0:
+#             for data in routers_data:
+#                 router_tree_view.insert('', 'end', values=data)
+
+#     # ---- CRUD Operation Methods (Database)  ---- #
+
+#     # 1 : Insert Data
+#     def insert(self, valid_input_data):
+
+#         try:
+#             # save to database
+#             self.cursor.execute(Database.insert_query, valid_input_data)
+#             self.connection.commit()
+
+#             # save to tree
+#             router_tree_view.insert('', 'end', values=valid_input_data)
+
+#         except Exception as e:
+#             print('Error in saving data : ', e)
+#             messagebox.showerror('Error', 'Error in saving data,try again...')
+
+#     # 2 : Update Data
+#     def update(self, valid_input_data):
+#         try:
+#             # update to database
+#             update_values = valid_input_data[1::]
+#             update_values.append(valid_input_data[0])
+
+#             self.cursor.execute(Database.update_query, update_values)
+#             self.connection.commit()
+
+#             # update tree
+#             router_tree_view.item(selected_tree_row_index, values=valid_input_data)
+
+#         except Exception as e:
+#             print('Error in updating data : ', e)
+#             messagebox.showerror('Error', 'Error in updating data,try again...')
+
+#     # 3 : Delete Data
+#     def delete(self, delete_id):
+
+#         try:
+#             # delete from database
+#             self.cursor.execute(Database.delete_query, [delete_id])
+#             self.connection.commit()
+
+#             # delete temporary
+#             router_tree_view.delete(selected_tree_row_index)
+
+#         except Exception as e:
+#             print('Error in deleting data : ', e)
+#             messagebox.showerror('Error', 'Error in deleting data,try again...')
+
+#     # 4 : search hostname
+#     def search_by_hostname(self, search_hostname):
+#         initial_data = self.cursor.execute(Database.hostname_search_query, ('%' + search_hostname + '%',))
+#         routers_data = initial_data.fetchall()
+
+#         if len(routers_data) != 0:
+#             for data in routers_data:
+#                 router_tree_view.insert('', 'end', values=data)
+
+#     def search_by_query(self, search_query):
+#         initial_data = self.cursor.execute(search_query)
+#         routers_data = initial_data.fetchall()
+
+#         if len(routers_data) != 0:
+#             for data in routers_data:
+#                 router_tree_view.insert('', 'end', values=data)
+
+
+# <----------- CRUD Operstion  -----------> #
+
 def add_book():
-    # Add code to handle adding a book to the data store.
-    # Retrieve data from the input fields and append it to the 'books' list.
-    pass
+    
+    """
+    -> Add code to handle adding a book to the data store. \n
+    -> Retrieve data from the input fields and append it to the 'books' list.
+    """
+    
+    isInputValid = get_input_data()
+    
+    if isInputValid : 
+        table_data.insert("","end",image=form_input_book_data[0],values=form_input_book_data[1:])
+        print("Added Succesfully")
+        clear_input_fields()
 
 
 # Function to update a book in the data store
@@ -56,58 +173,77 @@ def populate_table():
     default_book_cover = ImageTk.PhotoImage(img)
 
     # Insert the rows into the table
-    table_data.insert("", "end", iid=1, open=True, image=default_book_cover, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
+    table_data.insert("", "end",  image=default_book_cover, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
     
 # <----------- Helper Functions | Functionality -----------> #
 
-# def is_inputs_valid() -> bool:
-#     global input_data
+def is_inputs_valid() -> bool:
+    
+    global form_input_book_data
+     
+    try:
+        
+        try:
+            form_input_book_data[1] = int(form_input_book_data[1])
+        
+        except ValueError as t:
+            print("Id is not integer : ",t)
+            messagebox.showerror('Error', 'Id must be a number')
+            return False
+        
+        except Exception as e:
+            print("Id is not proper : ",e)
+            messagebox.showerror('Error', 'Please provide proper Id')
+            return False
+            
+        
+        if '' in form_input_book_data or None in form_input_book_data :
+            messagebox.showerror('Error', 'Please provide all inputs properly')
+            return False
+        
+        if float(form_input_book_data[7]) <= 0 or float(form_input_book_data[8]) <= 0:
+            messagebox.showerror('Error', "Price or Quantity can't be this")
+            return False
 
-#     try:
-#         new_id = int(entry_id.get())
+    except Exception as e:
+        print("Value Error", e)
+        messagebox.showerror('Error', 'Please provide proper inputs')
+        return False
 
-#         input_data = [new_id, entry_hostname.get(), entry_brand.get(), entry_ram.get(),
-#                       entry_flash.get()]
-
-#         if '' in input_data:
-#             messagebox.showerror('Error', 'Please provide proper inputs')
-#             return False
-
-#     except Exception as e:
-#         print("Value error in selection : ", e)
-#         messagebox.showerror('Error', 'Please provide proper inputs')
-#         return False
-
-#     return True
+    return True
 
 def get_input_data():
-    global input_books_data, book_cover_data
-
-    # Retrieve data from the input fields
-    book_id = entry_book_id.get()
-    book_name = entry_book_name.get()
-    book_subject = entry_book_subject.get()
-    author_name = entry_author_name.get()
-    publication = entry_publication.get()
-
-    date_of_publication = date_entry.get_date()
-
-    book_price = price_spinbox.get()
-    book_quantity = quantity_spinbox.get()
-    total_cost = total_entry.get()
-
-    input_books_data = [book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
-
-    img_choosen = Image.open(book_cover_path)
-    img_choosen = img_choosen.resize((80, 80), reducing_gap=Image.LANCZOS)
-    user_selected_cover = ImageTk.PhotoImage(img_choosen)
-
-    # Store the image data in a list or dictionary
-    book_cover_data.append(user_selected_cover)
-
-    # Insert data into the table
-    table_data.insert("", "end", iid=book_id, open=True, image=user_selected_cover, values=input_books_data)
     
+    global form_input_book_data
+
+    try:
+                
+        # Retrieve data from the input fields
+        book_id = entry_book_id.get()
+        book_name = entry_book_name.get()
+        book_subject = entry_book_subject.get()
+        author_name = entry_author_name.get()
+        publication = entry_publication.get()
+
+        date_of_publication = date_entry.get_date()
+        date_of_publication = date_of_publication.strftime("%d/%m/%Y")
+
+        book_price = price_spinbox.get()
+        book_quantity = quantity_spinbox.get()
+        total_cost = total_entry.get()
+        
+        img_choosen = Image.open(book_cover_path)
+        img_choosen = img_choosen.resize((80, 80), reducing_gap=Image.LANCZOS)
+        user_selected_cover = ImageTk.PhotoImage(img_choosen)
+
+        form_input_book_data = [user_selected_cover,book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
+
+        return is_inputs_valid()
+    
+    except Exception as e :
+        messagebox.showerror('Error', 'Provide proper values!')
+        print("Error in getting book data : ",e)
+        
 
 def set_book_cover(default=False):
     
@@ -121,12 +257,14 @@ def set_book_cover(default=False):
     if not default : 
         book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
 
-    if book_cover_path:
-        img_cover = Image.open(book_cover_path)
-        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
-        img_cover = ImageTk.PhotoImage(img_cover)
-        img_container.image = img_cover
-        img_container['image'] = img_cover
+    else:
+        book_cover_path=DEFAULT_BOOK_COVER_PATH
+        
+    img_cover = Image.open(book_cover_path)
+    img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
+    img_cover = ImageTk.PhotoImage(img_cover)
+    img_container.image = img_cover
+    img_container['image'] = img_cover
 
 def get_confirmation(msg="Are you sure , you want to proceed??"):
     
@@ -317,7 +455,7 @@ total_entry.place(x=660, y=170, width=300, height=30)
 # Action Buttons (4 buttons)
 
 add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
-add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=get_input_data,font=button_font, bg="#165d95", fg="white")
+add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=add_book,font=button_font, bg="#165d95", fg="white")
 
 update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
 update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=update_book, font=button_font, bg="#165d95", fg="white")
