@@ -1,6 +1,7 @@
 import tkinter as tk
 import sqlite3
 import re
+import io
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
@@ -29,7 +30,7 @@ user_selected_cover = None
 class Database:
     
     # Queries
-    
+    fetch_all_data_query = "SELECT * FROM books;"
     insert_query = "INSERT INTO books VALUES (?,?,?,?,?,?,?,?,?,?);"
     # update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
     # delete_query = "DELETE FROM routers WHERE id = ?;"
@@ -64,23 +65,34 @@ class Database:
 
     # Populate data at window loading / Opening
     def fetch_all_data(self):
-        pass
-        # initial_data = self.cursor.execute(Database.fetch_all_data_query)
-        # routers_data = initial_data.fetchall()
+        
+        global book_cover_data_list
+        
+        initial_data = self.cursor.execute(Database.fetch_all_data_query)
+        books_data = initial_data.fetchall()
 
-        # if len(routers_data) != 0:
-        #     for data in routers_data:
-        #         router_tree_view.insert('', 'end', values=data)
+        if len(books_data) != 0:
+            
+            for data in books_data:
+                
+                cover_blob = data[-1]
+                img = self.convert_blob_to_image(cover_blob)
+                book_cover_data_list.append(img)
+
+                # Insert the data along with the image
+                table_data.insert('', 'end', image=img, values=data[:-1])
+                
 
     # ---- CRUD Operation Methods (Database)  ---- #
 
     # 1 : Insert Data
     def insert(self, valid_input_data):
-
+                
         try:
             # save to database
             Database.cursor.execute(Database.insert_query, valid_input_data)
             Database.connection.commit()
+            
             
         except Exception as e:
             print('Error in saving data : ', e)
@@ -124,6 +136,20 @@ class Database:
         #     print('Error in deleting data : ', e)
         #     messagebox.showerror('Error', 'Error in deleting data,try again...')
 
+    def convert_blob_to_image(self, blob_data):
+                
+        try:
+            # Assuming the blob_data is in bytes format
+            image_stream = io.BytesIO(blob_data)
+            img = Image.open(image_stream)
+            img = img.resize((80, 80), Image.LANCZOS)  # Adjust size as needed
+            img = ImageTk.PhotoImage(img)
+            return img
+        
+        except Exception as e:
+            print(f"Error converting BLOB to image: {e}")
+            return None
+        
     # 4 : search hostname
     def search_by_hostname(self, search_hostname):
         pass
@@ -190,18 +216,6 @@ def search_books():
     # Add code to search for books based on the selected criteria and search text.
     pass
 
-
-# Function to populate the table with random data
-def populate_table():
-    global default_book_cover
-    
-    img = Image.open(book_cover_path)
-    img = img.resize((80, 80), reducing_gap=Image.LANCZOS)  # Adjust the size as needed
-    default_book_cover = ImageTk.PhotoImage(img)
-
-    # Insert the rows into the table
-    table_data.insert("", "end",  image=default_book_cover, values=("book_id", "book_name", "book_subject", "author_name", "publication", "date_of_publication", "book_price", "book_quantity", "total_cost"))
-    
 # <----------- Helper Functions | Functionality -----------> #
 
 def convertToBinaryData(file_Path):
@@ -582,7 +596,7 @@ table_data.tag_configure("even_row", background="white")  # or any other light c
 table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 
 # initilaizing heading-column
-table_data.heading("#0", text ="#") # Text of the column 
+table_data.heading("#0", text ="Book Cover") # Text of the column 
 table_data.column("#0", width = 50, anchor ='center') # Width of column
 
 for col in columns:
@@ -596,7 +610,7 @@ table_scrollbar.pack(side="right", fill="y")
 
 table_data.pack(fill="both", expand=True)
 
-# Populate the table with random data
-populate_table()
+# fetched stored datat
+database.fetch_all_data()
 
 main_window.mainloop()
