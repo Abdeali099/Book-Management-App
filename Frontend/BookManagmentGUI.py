@@ -156,19 +156,19 @@ class BookManagmentGUI(tk.Tk):
 
         add_btn_icon = tk.PhotoImage(file="./assets/addIcon.png")
         icons_list.append(add_btn_icon)
-        add_button = tk.Button(form_frame, width=150, text="Add", image=add_btn_icon, compound=tk.LEFT, command=BookServices.add_book,font=button_font, bg="#165d95", fg="white")
+        add_button = tk.Button(form_frame, width=150, cursor="hand2",text="Add", image=add_btn_icon, compound=tk.LEFT, command=BookServices.add_book,font=button_font, bg="#165d95", fg="white")
 
         update_btn_icon = tk.PhotoImage(file="./assets/updateIcon.png")
         icons_list.append(update_btn_icon)
-        update_button = tk.Button(form_frame, width=150, text="Update", image=update_btn_icon, compound=tk.LEFT, command=BookServices.update_book, font=button_font, bg="#165d95", fg="white")
+        update_button = tk.Button(form_frame, width=150, cursor="hand2",text="Update", image=update_btn_icon, compound=tk.LEFT, command=BookServices.update_book, font=button_font, bg="#165d95", fg="white")
 
         delete_btn_icon = tk.PhotoImage(file="./assets/deleteIcon.png")
         icons_list.append(delete_btn_icon)
-        delete_button = tk.Button(form_frame, width=150, text="Delete", image=delete_btn_icon, compound=tk.LEFT,command=BookServices.delete_book, font=button_font, bg="#165d95",fg="white")
+        delete_button = tk.Button(form_frame, width=150,cursor="hand2", text="Delete", image=delete_btn_icon, compound=tk.LEFT,command=BookServices.delete_book, font=button_font, bg="#165d95",fg="white")
 
         cancel_btn_icon = tk.PhotoImage(file="./assets/cancelIcon.png")
         icons_list.append(cancel_btn_icon)
-        cancel_button = tk.Button(form_frame, width=150, text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=lambda : BookServices.clear_input_fields(confirmation=True),font=button_font, bg="#165d95",fg="white")
+        cancel_button = tk.Button(form_frame, width=150,cursor="hand2", text="Cancel", image=cancel_btn_icon, compound=tk.LEFT, command=lambda : BookServices.clear_input_fields(confirmation=True),font=button_font, bg="#165d95",fg="white")
 
         add_button.place(x=180, y=245, height=40)
         update_button.place(x=360, y=245, height=40)
@@ -185,7 +185,7 @@ class BookManagmentGUI(tk.Tk):
         # select cover Image Button
         choose_cover_btn_icon = tk.PhotoImage(file="./assets/browseIcon.png")
         icons_list.append(choose_cover_btn_icon)
-        choose_cover_btn = tk.Button(form_frame, width=150, text="Choose Cover", image=choose_cover_btn_icon, compound=tk.LEFT, command=lambda : BookServices.set_book_cover(img_container), font=button_font, bg="#165d95", fg="white")
+        choose_cover_btn = tk.Button(form_frame, width=150,cursor="hand2", text="Choose Cover", image=choose_cover_btn_icon, compound=tk.LEFT, command=lambda : BookServices.set_book_cover(img_container), font=button_font, bg="#165d95", fg="white")
         choose_cover_btn.place(x=980, y=250, height=35)
 
         # ---- 2) Second Frame  : Filter frame ---- #
@@ -201,7 +201,7 @@ class BookManagmentGUI(tk.Tk):
         search_criteria = tk.StringVar()
         extra_gloabl_data_list.append(search_criteria)
         search_criteria.set("Id")  # Default search criteria
-        search_dropdown = ttk.Combobox(filter_frame, textvariable=search_criteria, state="readonly", values=["Id", "Book Name", "Publication", "Book Subject"], font=label_font)
+        search_dropdown = ttk.Combobox(filter_frame, cursor="hand2",textvariable=search_criteria, state="readonly", values=["Id", "Book Name", "Publication", "Book Subject"], font=label_font)
         search_dropdown.place(x=20, y=20, width=150, height=30)
 
         # Input field for search text
@@ -211,7 +211,7 @@ class BookManagmentGUI(tk.Tk):
         # Search Button
         search_btn_icon = tk.PhotoImage(file="./assets/searchIcon.png")
         icons_list.append(search_btn_icon)
-        search_button = tk.Button(filter_frame, text="Search", image=search_btn_icon,compound=tk.LEFT, command=BookServices.search_books, font=button_font, bg="#165d95", fg="white")
+        search_button = tk.Button(filter_frame,cursor="hand2", text="Search", image=search_btn_icon,compound=tk.LEFT, command=BookServices.search_books, font=button_font, bg="#165d95", fg="white")
         search_button.place(x=500, y=20, width=250, height=30)
 
         # ---- Third Frame  : Table frame ---- #
@@ -234,8 +234,12 @@ class BookManagmentGUI(tk.Tk):
         table_data['show'] = 'tree headings'
 
         #  style for table 
-        style.configure('Treeview.Heading', background="#165d95",font=table_heading_font,foreground="white")
-        style.configure('Treeview',font=text_filed_font,rowheight=50)
+        style.configure('Treeview.Heading',cursor="hand2", background="#165d95",font=table_heading_font,foreground="white")
+        style.configure('Treeview',font=text_filed_font,rowheight=50,cursor="hand2")
+        table_data.bind('<<TreeviewSelect>>', BookServices.select_row_of_table)
+        table_data.bind("<Enter>", BookManagmentGUI.on_table_enter)
+        table_data.bind("<Leave>", BookManagmentGUI.on_table_leave)
+        # table_data.bind('<<TreeviewSelect>>', command = lambda : BookServices.select_row_of_table(table_data))
         # table_data.tag_configure("even_row", background="white")  # or any other light color
         # table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 
@@ -297,3 +301,14 @@ class BookManagmentGUI(tk.Tk):
         except Exception as e :
             messagebox.showerror('Error', 'Provide proper value of price or quantity')
             print("Error in reading price | quantity : ",e)
+
+
+    @staticmethod
+    def on_table_enter(event):
+        table_data = event.widget
+        table_data["cursor"] = "hand2"
+
+    @staticmethod
+    def on_table_leave(event):
+        table_data = event.widget
+        table_data["cursor"] = ""

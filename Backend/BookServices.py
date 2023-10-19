@@ -2,17 +2,19 @@ import tkinter as tk
 import sqlite3
 import re
 import io
-from tkinter import filedialog
+from tkinter import END, filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import DateEntry
 from PIL import Image, ImageTk
-from datetime import date
+from datetime import date, datetime
 
 from Backend.Database import Database
 
 # <----- Variables -------> #
 form_input_book_data=[]
+
+selected_tree_row_index = ""
 
 # Global variables for images and its data
 book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
@@ -33,6 +35,10 @@ class BookServices:
         global GUI
         
         GUI = gui_components
+    
+    @staticmethod
+    def fetch_all_data():
+        return Database.fetch_all_data()
     
     @staticmethod
     def add_book():
@@ -129,6 +135,7 @@ class BookServices:
     
     @staticmethod
     def get_input_data():
+        
         global form_input_book_data
 
         try:
@@ -161,7 +168,7 @@ class BookServices:
             
 
     @staticmethod
-    def set_book_cover(img_container,default=False):
+    def set_book_cover(img_container,default=False,object=None):
     
         """
         -> Set book cover image to label. \n
@@ -170,20 +177,27 @@ class BookServices:
         
         global book_cover_path
         
-        if not default : 
-            book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+        if not object : 
             
-            if not book_cover_path :
-                return
+            if not default : 
+                book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+                
+                if not book_cover_path :
+                    return
 
-        else:
-            book_cover_path=DEFAULT_BOOK_COVER_PATH
+            else:
+                book_cover_path=DEFAULT_BOOK_COVER_PATH
+                
+            img_cover = Image.open(book_cover_path)
+            img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
+            img_cover = ImageTk.PhotoImage(img_cover)
+            img_container.image = img_cover
+            img_container['image'] = img_cover
             
-        img_cover = Image.open(book_cover_path)
-        img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
-        img_cover = ImageTk.PhotoImage(img_cover)
-        img_container.image = img_cover
-        img_container['image'] = img_cover
+        else :
+            img_container.image = object
+            img_container['image'] = object
+            
 
     @staticmethod
     def get_confirmation(msg="Are you sure, you want to proceed??"):
@@ -199,6 +213,8 @@ class BookServices:
 
     @staticmethod
     def clear_input_fields(confirmation=False):
+        
+        global selected_tree_row_index
             
         """
         -> This function clear the input fields and set initial value of some entries. \n
@@ -210,7 +226,8 @@ class BookServices:
             
             if not do_clear:
                 return
-    
+        
+        GUI['entry_book_id'].config(state="normal",cursor="xterm")
         GUI['entry_book_id'].delete(0, tk.END)
         GUI['entry_book_name'].delete(0, tk.END)
         GUI['entry_book_subject'].delete(0, tk.END)
@@ -230,9 +247,60 @@ class BookServices:
         GUI['total_entry'].insert(0, "0.00")
         GUI['total_entry'].config(state="readonly") 
         
+        #table related
+        selected_tree_row_index=""
+        
+        selected_item = GUI['table_data'].selection()
+        
+        if selected_item:
+                GUI['table_data'].selection_remove(selected_item)
+    
         BookServices.set_book_cover(GUI['img_container'],default=True)
         
-        
     @staticmethod
-    def fetch_all_data():
-        return Database.fetch_all_data()
+    def select_row_of_table(event):
+        
+        global selected_tree_row_index
+
+        try:
+
+            selected_tree_row_index = GUI['table_data'].selection()[0]
+
+            selected_item = GUI['table_data'].item(selected_tree_row_index)['values']
+            row_img = GUI['table_data'].item(selected_tree_row_index)['image']
+
+            GUI['entry_book_id'].delete(0, END)
+            GUI['entry_book_id'].insert(0, selected_item[0])
+            GUI['entry_book_id'].config(state="readonly",cursor="X_cursor")  
+            
+            GUI['entry_book_name'].delete(0, END)
+            GUI['entry_book_name'].insert(0,selected_item[1])
+
+            GUI['entry_book_subject'].delete(0, END)
+            GUI['entry_book_subject'].insert(0, selected_item[2])
+
+            GUI['entry_author_name'].delete(0, END)
+            GUI['entry_author_name'].insert(0,selected_item[3])
+
+            GUI['entry_publication'].delete(0, END)
+            GUI['entry_publication'].insert(0,selected_item[4])
+
+            GUI['date_entry'].set_date(datetime.strptime(selected_item[5], '%d/%m/%Y').date())
+
+            GUI['price_spinbox'].delete(0, END)
+            GUI['price_spinbox'].insert(0,selected_item[6])
+
+            GUI['quantity_spinbox'].delete(0, END)
+            GUI['quantity_spinbox'].insert(0,selected_item[7])
+
+            GUI['total_entry'].config(state="normal")
+            GUI['total_entry'].delete(0, END)
+            GUI['total_entry'].insert(0,selected_item[8])
+            GUI['total_entry'].config(state="readonly")  
+                        
+            BookServices.set_book_cover(GUI['img_container'],object=row_img[0])
+            
+            return
+
+        except Exception as e:
+            print("Error in selection row  : ", e)
