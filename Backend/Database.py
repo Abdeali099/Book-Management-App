@@ -18,7 +18,7 @@ class Database:
     # Queries
     fetch_all_data_query = "SELECT * FROM books;"
     insert_query = "INSERT INTO books VALUES (?,?,?,?,?,?,?,?,?,?);"
-    # update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
+    update_query = "UPDATE books SET subject=? , book_name=? , author_name=? , publication=?, pub_date=? , price=? , quantity=? , cost=? ,cover =? WHERE id = ?;"
     delete_query = "DELETE FROM books WHERE id = ?;"
     # search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
     
@@ -78,7 +78,12 @@ class Database:
             # save to database
             Database.cursor.execute(Database.insert_query, valid_input_data)
             Database.connection.commit()
-        
+            
+        except sqlite3.IntegrityError as e:
+            print('Error in saving data - Unique constraint violation:', e)
+            messagebox.showerror('Error', 'Error: Duplicate entry, try again...')
+            return False
+                
         except Exception as e:
             print('Error in saving data : ', e)
             messagebox.showerror('Error', 'Error in saving data into database,try again...')
@@ -86,8 +91,27 @@ class Database:
         
         return True
     
+
+    # 2 : Update Data
+    def update(self, valid_input_data):
+
+        try:
+            # update to database
+            update_values = valid_input_data[1::]
+            update_values.append(valid_input_data[0])
+
+            self.cursor.execute(Database.update_query, update_values)
+            Database.connection.commit()
+
+        
+        except Exception as e:
+            print('Error in updating data : ', e)
+            messagebox.showerror('Error', 'Error in updating data,try again...')
+            return False
+        
+        return True
+
     
-        # 3 : Delete Data
     def delete(self, delete_id):
         
         try:
@@ -109,7 +133,7 @@ class Database:
             # Assuming the blob_data is in bytes format
             image_stream = io.BytesIO(blob_data)
             img = Image.open(image_stream)
-            img = img.resize((80, 80), Image.LANCZOS)  # Adjust size as needed
+            img = img.resize((150,200), Image.LANCZOS)  # Adjust size as needed
             img = ImageTk.PhotoImage(img)
             return img
         

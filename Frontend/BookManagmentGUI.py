@@ -231,7 +231,8 @@ class BookManagmentGUI(tk.Tk):
         table_data["columns"] = columns
 
         # Defining heading
-        table_data['show'] = 'tree headings'
+        # table_data['show'] = 'tree headings' # if do not want to show images in table (If do this set resize to (80,80) insted of (150,200) when set to table)
+        table_data['show'] = 'headings' # if do not want to show images in table (If do this set resize to (150,200) insted of (80,80) when set to table)
 
         #  style for table 
         style.configure('Treeview.Heading',cursor="hand2", background="#165d95",font=table_heading_font,foreground="white")
@@ -239,7 +240,6 @@ class BookManagmentGUI(tk.Tk):
         table_data.bind('<<TreeviewSelect>>', BookServices.select_row_of_table)
         table_data.bind("<Enter>", BookManagmentGUI.on_table_enter)
         table_data.bind("<Leave>", BookManagmentGUI.on_table_leave)
-        # table_data.bind('<<TreeviewSelect>>', command = lambda : BookServices.select_row_of_table(table_data))
         # table_data.tag_configure("even_row", background="white")  # or any other light color
         # table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
 

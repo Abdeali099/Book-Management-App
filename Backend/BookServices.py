@@ -43,7 +43,7 @@ class BookServices:
     @staticmethod
     def add_book():
             
-        global form_input_book_data,book_cover_format
+        global form_input_book_data
             
         """
         -> Add code to handle adding a book to the data store. \n
@@ -67,9 +67,32 @@ class BookServices:
 
     @staticmethod
     def update_book():
-        # Your existing update_book method
-        pass
-
+        
+        global form_input_book_data,selected_tree_row_index
+        
+        if selected_tree_row_index == "" :
+            messagebox.showerror('Error', 'Please select the data first.')
+            return
+                
+        do_update=BookServices.get_confirmation("Are you sure to update the data?")
+            
+        if not do_update:
+            return
+                    
+        isInputValid = BookServices.get_input_data(via="update")
+        
+        if isInputValid : 
+                    
+            form_input_book_data.append(BookServices.convertToBinaryData(book_cover_path))
+            
+            isDataUpdated=database.update(form_input_book_data[1:])
+            
+            if isDataUpdated :
+                    
+                # update tree
+                GUI['table_data'].item(selected_tree_row_index, image=form_input_book_data[0],values=form_input_book_data[1:-1])
+            
+            
     @staticmethod
     def delete_book():
         
@@ -153,7 +176,7 @@ class BookServices:
     
     
     @staticmethod
-    def get_input_data():
+    def get_input_data(via="add"):
         
         global form_input_book_data
 
@@ -173,10 +196,16 @@ class BookServices:
             book_quantity = GUI['quantity_spinbox'].get()
             total_cost = GUI['total_entry'].get()
             
-            img_choosen = Image.open(book_cover_path)
-            img_choosen = img_choosen.resize((50, 50), reducing_gap=Image.LANCZOS)
-            user_selected_cover = ImageTk.PhotoImage(img_choosen)
-
+            if via == "update" and book_cover_path == DEFAULT_BOOK_COVER_PATH :
+                
+                user_selected_cover = GUI['table_data'].item(selected_tree_row_index)['image'][0]
+                    
+            else:
+    
+                img_choosen = Image.open(book_cover_path)
+                img_choosen = img_choosen.resize((150,200), reducing_gap=Image.LANCZOS)
+                user_selected_cover = ImageTk.PhotoImage(img_choosen)
+                    
             form_input_book_data = [user_selected_cover,book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
 
             return BookServices.is_inputs_valid()
