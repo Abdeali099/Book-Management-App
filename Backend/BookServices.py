@@ -72,9 +72,28 @@ class BookServices:
 
     @staticmethod
     def delete_book():
-        # Your existing delete_book method
-        pass
+        
+        global selected_tree_row_index
+        
+        if selected_tree_row_index == "" :
+            messagebox.showerror('Error', 'Please select the data first.')
+            return
+                
+        do_delete=BookServices.get_confirmation("Are you sure to delete the data?")
+            
+        if not do_delete:
+            return
+        
+        isDataDeleted=database.delete(int( GUI['entry_book_id'].get()))
+            
+        if isDataDeleted :
+                
+            # delete from table
+            GUI['table_data'].delete(selected_tree_row_index)
 
+            BookServices.clear_input_fields()
+
+        
     @staticmethod
     def search_books():
         # Your existing search_books method

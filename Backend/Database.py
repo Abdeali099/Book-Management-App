@@ -19,7 +19,7 @@ class Database:
     fetch_all_data_query = "SELECT * FROM books;"
     insert_query = "INSERT INTO books VALUES (?,?,?,?,?,?,?,?,?,?);"
     # update_query = "UPDATE routers SET hostname=? , brand=? , ram=? , flash=? WHERE id = ?;"
-    # delete_query = "DELETE FROM routers WHERE id = ?;"
+    delete_query = "DELETE FROM books WHERE id = ?;"
     # search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
     
     # class objects
@@ -84,6 +84,22 @@ class Database:
             messagebox.showerror('Error', 'Error in saving data into database,try again...')
             return False
         
+        return True
+    
+    
+        # 3 : Delete Data
+    def delete(self, delete_id):
+        
+        try:
+            # delete from database
+            self.cursor.execute(Database.delete_query, [delete_id])
+            Database.connection.commit()
+            
+        except Exception as e:
+            print('Error in deleting data : ', e)
+            messagebox.showerror('Error', 'Error in deleting data,try again...')
+            return False
+
         return True
 
     @staticmethod
