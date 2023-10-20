@@ -11,20 +11,10 @@ from Backend.BookServices import BookServices
 
 # <----- Variables -------> #
 
-# Sample data store for books
-form_input_book_data= []
-stored_books_data_list = []
-
-# pattern for totalcost
-pattern_real_number = re.compile(r"^\d+(\.\d+)?$")
-pattern_natural_number = re.compile(r"^\d?$")
-
 # Global variables for images and its data
 extra_gloabl_data_list = []
 icons_list = []
 book_cover_data_list = []
-default_book_cover = None
-user_selected_cover = None
 
 
 class BookManagmentGUI(tk.Tk):
@@ -259,29 +249,17 @@ class BookManagmentGUI(tk.Tk):
         table_data.pack(fill="both", expand=True)
         
         fetched_data=BookServices.fetch_all_data()
-        total_data_count = 0
-                
-        # fetching previous store data and display it
-        if len(fetched_data) != 0:
+        
+        BookServices.insert_data_in_table(table_data,fetched_data)
             
-            for data in fetched_data:
-                
-                book_cover_data_list.append(data[-1])
-                
-                row_position = "even_row" if total_data_count%2==0 else "odd_row"
-                
-                table_data.insert('', 'end',tags=(row_position,),image=data[-1], values=data[:-1])
-                
-                total_data_count+=1
-                
         # passing gui component refrence to service 
         
         selected_variables = ["entry_book_id","entry_book_name","entry_book_subject","entry_author_name","entry_publication","date_entry","price_spinbox","quantity_spinbox","total_entry","img_container","table_data"]
 
         gui_component = {key: value for key, value in locals().items() if key in selected_variables}
 
-        BookServices.setGUIrefereces(gui_component,total_data_count)
-
+        BookServices.setGUIrefereces(gui_component)
+    
     @staticmethod
     def calculate_total(price_spinbox,quantity_spinbox,total_entry):
     

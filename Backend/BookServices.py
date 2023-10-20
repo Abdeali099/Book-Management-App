@@ -10,6 +10,7 @@ from PIL import Image, ImageTk
 from datetime import date, datetime
 
 from Backend.Database import Database
+# from Frontend.BookManagmentGUI import BookManagmentGUI
 
 # <----- Variables -------> #
 form_input_book_data=[]
@@ -19,6 +20,7 @@ selected_tree_row_index = ""
 # Global variables for images and its data
 book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
 total_data_count = 0
+book_cover_data_list = []
 GUI = None
 
 database=None
@@ -32,16 +34,40 @@ class BookServices:
         database=Database()
         
     @staticmethod
-    def setGUIrefereces(gui_components,count):
-        global GUI,total_data_count
+    def setGUIrefereces(gui_components):
+        global GUI
         
         GUI = gui_components
+        
+    @staticmethod
+    def setDataCount(count):
+        global total_data_count
+        
         total_data_count=count
     
     @staticmethod
     def fetch_all_data():
         return Database.fetch_all_data()
     
+    @staticmethod
+    def insert_data_in_table(table_data,fetched_data):
+        
+        global book_cover_data_list,total_data_count
+        
+        # fetching previous store data and display it
+        if len(fetched_data) != 0:
+            
+            for data in fetched_data:
+                
+                book_cover_data_list.append(data[-1])
+                
+                row_position = "even_row" if total_data_count%2==0 else "odd_row"
+                
+                table_data.insert('', 'end',tags=(row_position,),image=data[-1], values=data[:-1])
+                
+                total_data_count+=1
+                
+                
     @staticmethod
     def add_book():
             
@@ -61,14 +87,15 @@ class BookServices:
             isDataAdded=database.insert(form_input_book_data[1:])
             
             if isDataAdded :
-                row_position = "even_row" if total_data_count%2==0 else "odd_row"
                 
+                row_position = "even_row" if total_data_count%2==0 else "odd_row"
                 total_data_count+=1
                 
                 # insert into table
                 GUI['table_data'].insert('', 'end',tags=(row_position,), image=form_input_book_data[0],values=form_input_book_data[1:-1])
 
                 BookServices.clear_input_fields()
+                
 
     @staticmethod
     def update_book():
