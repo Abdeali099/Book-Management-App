@@ -240,8 +240,8 @@ class BookManagmentGUI(tk.Tk):
         table_data.bind('<<TreeviewSelect>>', BookServices.select_row_of_table)
         table_data.bind("<Enter>", BookManagmentGUI.on_table_enter)
         table_data.bind("<Leave>", BookManagmentGUI.on_table_leave)
-        # table_data.tag_configure("even_row", background="white")  # or any other light color
-        # table_data.tag_configure("odd_row", background="#a1bde8")  # or any other dark color
+        table_data.tag_configure("even_row", background="#f7ebd5")  # or any other light color
+        table_data.tag_configure("odd_row", background="#a6cee1")  # or any other dark color
 
         # initilaizing heading-column
         table_data.heading("#0", text ="Book Cover") # Text of the column 
@@ -259,6 +259,7 @@ class BookManagmentGUI(tk.Tk):
         table_data.pack(fill="both", expand=True)
         
         fetched_data=BookServices.fetch_all_data()
+        total_data_count = 0
                 
         # fetching previous store data and display it
         if len(fetched_data) != 0:
@@ -266,7 +267,12 @@ class BookManagmentGUI(tk.Tk):
             for data in fetched_data:
                 
                 book_cover_data_list.append(data[-1])
-                table_data.insert('', 'end',image=data[-1], values=data[:-1])
+                
+                row_position = "even_row" if total_data_count%2==0 else "odd_row"
+                
+                table_data.insert('', 'end',tags=(row_position,),image=data[-1], values=data[:-1])
+                
+                total_data_count+=1
                 
         # passing gui component refrence to service 
         
@@ -274,7 +280,7 @@ class BookManagmentGUI(tk.Tk):
 
         gui_component = {key: value for key, value in locals().items() if key in selected_variables}
 
-        BookServices.setGUIrefereces(gui_component)
+        BookServices.setGUIrefereces(gui_component,total_data_count)
 
     @staticmethod
     def calculate_total(price_spinbox,quantity_spinbox,total_entry):

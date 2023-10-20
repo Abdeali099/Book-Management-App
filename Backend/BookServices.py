@@ -18,6 +18,7 @@ selected_tree_row_index = ""
 
 # Global variables for images and its data
 book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
+total_data_count = 0
 GUI = None
 
 database=None
@@ -31,10 +32,11 @@ class BookServices:
         database=Database()
         
     @staticmethod
-    def setGUIrefereces(gui_components):
-        global GUI
+    def setGUIrefereces(gui_components,count):
+        global GUI,total_data_count
         
         GUI = gui_components
+        total_data_count=count
     
     @staticmethod
     def fetch_all_data():
@@ -43,7 +45,7 @@ class BookServices:
     @staticmethod
     def add_book():
             
-        global form_input_book_data
+        global form_input_book_data,total_data_count
             
         """
         -> Add code to handle adding a book to the data store. \n
@@ -59,9 +61,12 @@ class BookServices:
             isDataAdded=database.insert(form_input_book_data[1:])
             
             if isDataAdded :
+                row_position = "even_row" if total_data_count%2==0 else "odd_row"
+                
+                total_data_count+=1
                 
                 # insert into table
-                GUI['table_data'].insert('', 'end', image=form_input_book_data[0],values=form_input_book_data[1:-1])
+                GUI['table_data'].insert('', 'end',tags=(row_position,), image=form_input_book_data[0],values=form_input_book_data[1:-1])
 
                 BookServices.clear_input_fields()
 
@@ -113,9 +118,25 @@ class BookServices:
                 
             # delete from table
             GUI['table_data'].delete(selected_tree_row_index)
+            
+            BookServices.formate_row_color()
 
             BookServices.clear_input_fields()
 
+    @staticmethod
+    def formate_row_color():
+        
+        global total_data_count
+        
+        total_data_count = 0
+        
+        for record in GUI['table_data'].get_children():
+            
+            row_position = "even_row" if total_data_count%2==0 else "odd_row"
+            
+            GUI['table_data'].item(record, tags=(row_position,))
+                
+            total_data_count += 1
         
     @staticmethod
     def search_books():
