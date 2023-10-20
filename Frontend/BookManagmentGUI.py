@@ -1,11 +1,7 @@
 import tkinter as tk
-import re
-from tkinter import filedialog
 from tkinter import messagebox
 from tkinter import ttk
 from tkcalendar import DateEntry
-from PIL import Image, ImageTk
-from datetime import date
 from Backend.BookServices import BookServices
 
 
@@ -202,7 +198,13 @@ class BookManagmentGUI(tk.Tk):
         search_btn_icon = tk.PhotoImage(file="./assets/searchIcon.png")
         icons_list.append(search_btn_icon)
         search_button = tk.Button(filter_frame,cursor="hand2", text="Search", image=search_btn_icon,compound=tk.LEFT, command=BookServices.search_books, font=button_font, bg="#165d95", fg="white")
-        search_button.place(x=500, y=20, width=250, height=30)
+        search_button.place(x=500, y=20, width=125, height=30)
+
+        # Clear Button
+        clear_btn_icon = tk.PhotoImage(file="./assets/clearIcon.png")
+        icons_list.append(clear_btn_icon)
+        clear_button = tk.Button(filter_frame,cursor="hand2", text="Clear", image=clear_btn_icon,compound=tk.LEFT, command=BookServices.reset_table, font=button_font, bg="#165d95", fg="white")
+        clear_button.place(x=640, y=20, width=125, height=30)
 
         # ---- Third Frame  : Table frame ---- #
 
@@ -254,7 +256,7 @@ class BookManagmentGUI(tk.Tk):
             
         # passing gui component refrence to service 
         
-        selected_variables = ["entry_book_id","entry_book_name","entry_book_subject","entry_author_name","entry_publication","date_entry","price_spinbox","quantity_spinbox","total_entry","img_container","table_data"]
+        selected_variables = ["entry_book_id","entry_book_name","entry_book_subject","entry_author_name","entry_publication","date_entry","price_spinbox","quantity_spinbox","total_entry","img_container","table_data","search_criteria","search_dropdown","search_text"]
 
         gui_component = {key: value for key, value in locals().items() if key in selected_variables}
 

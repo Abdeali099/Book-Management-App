@@ -1,26 +1,14 @@
-# backend/database.py
-
 import sqlite3
 import io
-
-import tkinter as tk
-# import sqlite3
-import re
-# import io
-from tkinter import filedialog
 from tkinter import messagebox
-from tkinter import ttk
-from tkcalendar import DateEntry
 from PIL import Image, ImageTk
-from datetime import date
 
 class Database:
     # Queries
     fetch_all_data_query = "SELECT * FROM books;"
     insert_query = "INSERT INTO books VALUES (?,?,?,?,?,?,?,?,?,?);"
-    update_query = "UPDATE books SET subject=? , book_name=? , author_name=? , publication=?, pub_date=? , price=? , quantity=? , cost=? ,cover =? WHERE id = ?;"
+    update_query = "UPDATE books SET book_subject=? , book_name=? , author_name=? , publication=?, pub_date=? , price=? , quantity=? , cost=? ,cover =? WHERE id = ?;"
     delete_query = "DELETE FROM books WHERE id = ?;"
-    # search_query = "SELECT * FROM routers WHERE hostname LIKE ? ;"
     
     # class objects
     cursor=None
@@ -35,7 +23,7 @@ class Database:
             """
             CREATE TABLE IF NOT EXISTS 
             books (id INTEGER PRIMARY KEY, 
-                     subject TEXT, 
+                     book_subject TEXT, 
                      book_name TEXT, 
                      author_name TEXT, 
                      publication TEXT,
@@ -100,7 +88,7 @@ class Database:
             update_values = valid_input_data[1::]
             update_values.append(valid_input_data[0])
 
-            self.cursor.execute(Database.update_query, update_values)
+            Database.cursor.execute(Database.update_query, update_values)
             Database.connection.commit()
 
         
@@ -116,7 +104,7 @@ class Database:
         
         try:
             # delete from database
-            self.cursor.execute(Database.delete_query, [delete_id])
+            Database.cursor.execute(Database.delete_query, [delete_id])
             Database.connection.commit()
             
         except Exception as e:
@@ -141,8 +129,24 @@ class Database:
             print(f"Error converting BLOB to image: {e}")
             return None
 
-    def search_by_hostname(self, search_hostname):
-         pass # Your existing search_by_hostname method
+    @staticmethod
+    def query_book(field,keyword):
 
-    def search_by_query(self, search_query):
-         pass # Your existing search_by_query method
+        book_data_for_table=[]
+        search_query = f"SELECT * FROM books WHERE {field} LIKE ? ;"
+        
+        initial_data = Database.cursor.execute(search_query,[keyword])
+        books_data = initial_data.fetchall()
+                
+        if len(books_data) != 0:
+            
+            for data in books_data:
+                                
+                cover_blob = data[-1]
+                data=list(data)
+                data[-1] = Database.convert_blob_to_image(cover_blob)            
+                book_data_for_table.append(data)
+
+        
+        return book_data_for_table
+            

@@ -1,30 +1,23 @@
 import tkinter as tk
-import sqlite3
-import re
-import io
 from tkinter import END, filedialog
 from tkinter import messagebox
-from tkinter import ttk
-from tkcalendar import DateEntry
 from PIL import Image, ImageTk
 from datetime import date, datetime
 
 from Backend.Database import Database
-# from Frontend.BookManagmentGUI import BookManagmentGUI
 
 # <----- Variables -------> #
 form_input_book_data=[]
-
+GUI = None
 selected_tree_row_index = ""
 
 # Global variables for images and its data
 book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
 total_data_count = 0
 book_cover_data_list = []
-GUI = None
 
+# objects 
 database=None
-
 
 class BookServices:
     
@@ -38,13 +31,7 @@ class BookServices:
         global GUI
         
         GUI = gui_components
-        
-    @staticmethod
-    def setDataCount(count):
-        global total_data_count
-        
-        total_data_count=count
-    
+
     @staticmethod
     def fetch_all_data():
         return Database.fetch_all_data()
@@ -53,6 +40,8 @@ class BookServices:
     def insert_data_in_table(table_data,fetched_data):
         
         global book_cover_data_list,total_data_count
+        
+        total_data_count=0
         
         # fetching previous store data and display it
         if len(fetched_data) != 0:
@@ -67,6 +56,15 @@ class BookServices:
                 
                 total_data_count+=1
                 
+
+    @staticmethod
+    def reset_table():
+        # empty old data
+        BookServices.empty_table()
+        
+        GUI['search_criteria'].set("Id")  # Default search criteria
+        BookServices.insert_data_in_table(GUI['table_data'],Database.fetch_all_data())
+        
                 
     @staticmethod
     def add_book():
@@ -167,8 +165,42 @@ class BookServices:
         
     @staticmethod
     def search_books():
-        # Your existing search_books method
-        pass
+        
+        # get filed to be search 
+        search_field = GUI['search_dropdown'].get().strip().lower().replace(" ", "_")
+        print(search_field)
+        
+        # get search word
+        search_keyword = GUI['search_text'].get()
+        print(search_keyword)
+        
+        if search_keyword == '':
+            messagebox.showerror('Error', 'Please enter what to be search.')
+            return
+        
+        if search_field=="id" :
+            try:
+                search_keyword = int(search_keyword)
+            except Exception as e :
+                messagebox.showerror('Error', 'Please enter digits for Id.')
+            
+        print("search_filed : " , search_field , " keyword : ",search_keyword)
+        
+        searched_data = Database.query_book(search_field,search_keyword)
+        
+        if len(searched_data) == 0 :
+            messagebox.showinfo("Information",'No data avialable.')
+            return
+                
+        # empty old data
+        BookServices.empty_table()
+
+        BookServices.insert_data_in_table(GUI['table_data'],searched_data)
+        
+    @staticmethod
+    def empty_table():
+        for item in GUI['table_data'].get_children():
+            GUI['table_data'].delete(item)
 
     @staticmethod
     def convertToBinaryData(file_path):
