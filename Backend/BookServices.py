@@ -404,6 +404,7 @@ class BookServices:
             selected_item = GUI['table_data'].item(selected_tree_row_index)['values']
             row_img = GUI['table_data'].item(selected_tree_row_index)['image']
 
+            GUI['entry_book_id'].config(state="normal",cursor="")  
             GUI['entry_book_id'].delete(0, END)
             GUI['entry_book_id'].insert(0, selected_item[0])
             GUI['entry_book_id'].config(state="readonly",cursor="X_cursor")  
@@ -433,7 +434,7 @@ class BookServices:
             GUI['total_entry'].insert(0,selected_item[8])
             GUI['total_entry'].config(state="readonly")  
                         
-            BookServices.set_book_cover(GUI['img_container'],object=row_img[0])
+            BookServices.set_book_cover(GUI['img_container'],object=row_img[0])            
             
             return
 
@@ -448,7 +449,7 @@ class BookServices:
         -> Use also as "Cancel".
         """
         
-        global selected_tree_row_index
+        global selected_tree_row_index,book_cover_path
         
         if confirmation :
             do_clear=BookServices.get_confirmation("Are you sure to clear fields?")
@@ -477,6 +478,8 @@ class BookServices:
         GUI['total_entry'].config(state="readonly") 
         
         BookServices.set_book_cover(GUI['img_container'],default=True)
+        
+        book_cover_path = "./assets/byDefaultCover.jpg"
         
         # clear selection from table
         selected_tree_row_index=""
