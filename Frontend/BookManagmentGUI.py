@@ -217,6 +217,7 @@ class BookManagmentGUI(tk.Tk):
 
         # Defining of columns
         columns =  ("Book ID", "Book Name", "Book Subject", "Author Name", "Publication", "Publication Date", "Book Price", "Book Quantity", "Total Cost")
+        columns_width =  (50, 150, 150, 120, 120, 100, 100, 100, 100)
         table_data["columns"] = columns
 
         # Defining heading
@@ -236,9 +237,9 @@ class BookManagmentGUI(tk.Tk):
         table_data.heading("#0", text ="Book Cover") # Text of the column 
         table_data.column("#0", width = 80, anchor ='center') # Width of column
 
-        for col in columns:
+        for col,width in zip(columns,columns_width):
             table_data.heading(col, text=col)
-            table_data.column(col, width=120,anchor=tk.CENTER)
+            table_data.column(col, width=width,anchor=tk.CENTER)
             
         # Add a vertical scrollbar
         table_scrollbar = ttk.Scrollbar(table_frame, orient="vertical", command=table_data.yview)

@@ -149,7 +149,7 @@ class Database:
         
         try:
         
-            search_query=Database.search_query.formate(field=field)
+            search_query=Database.search_query.format(field=field)
             
             initial_data = Database.cursor.execute(search_query,[keyword])
             books_data = initial_data.fetchall()

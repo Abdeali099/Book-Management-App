@@ -176,6 +176,7 @@ class BookServices:
         BookServices.empty_table()
         
         GUI['search_criteria'].set("Id")  # Default search criteria
+        GUI['search_text'].delete(0,"end")
         BookServices.insert_data_in_table(GUI['table_data'],Database.fetch_all_data())
                 
     @staticmethod
