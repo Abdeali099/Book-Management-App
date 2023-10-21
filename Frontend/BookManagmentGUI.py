@@ -8,17 +8,15 @@ from Backend.BookServices import BookServices
 # <----- Variables -------> #
 
 # Global variables for images and its data
+# Note : We use this because the keep refence. otherwise grabage collection will wipe it out
 extra_gloabl_data_list = []
 icons_list = []
-book_cover_data_list = []
 
 
 class BookManagmentGUI(tk.Tk):
     
     def __init__(self) -> None:
-        
-        global book_cover_data_list,icons_list
-        
+                
         super().__init__()
         
         # BookService object
@@ -99,7 +97,6 @@ class BookManagmentGUI(tk.Tk):
         entry_publication.place(x=180, y=120, width=300, height=30)
 
         # Label and the DateEntry widget
-
         label_date = tk.Label(form_frame, text=labels[5], font=label_font, bg="#60cb5f", fg="black")
         label_date.place(x=500, y=120)
 
@@ -224,7 +221,7 @@ class BookManagmentGUI(tk.Tk):
 
         # Defining heading
         # table_data['show'] = 'tree headings' # if do not want to show images in table (If do this set resize to (80,80) insted of (150,200) when set to table)
-        table_data['show'] = 'headings' # if do not want to show images in table (If do this set resize to (150,200) insted of (80,80) when set to table)
+        table_data['show'] = 'headings' # if  do not want to show images in table (If do this set resize to (150,200) insted of (80,80) when set to table)
 
         #  style for table 
         style.configure('Treeview.Heading',cursor="hand2", background="#165d95",font=table_heading_font,foreground="white")
@@ -257,21 +254,18 @@ class BookManagmentGUI(tk.Tk):
         # passing gui component refrence to service 
         
         selected_variables = ["entry_book_id","entry_book_name","entry_book_subject","entry_author_name","entry_publication","date_entry","price_spinbox","quantity_spinbox","total_entry","img_container","table_data","search_criteria","search_dropdown","search_text"]
-
         gui_component = {key: value for key, value in locals().items() if key in selected_variables}
-
         BookServices.setGUIrefereces(gui_component)
     
     @staticmethod
     def calculate_total(price_spinbox,quantity_spinbox,total_entry):
     
         """
-        -> This function calls whenever price or quantity changes and calcluate total and set it.
+        -> This method calls whenever price or quantity changes and calcluate total and set it.
         """
         
         try:
             # Get the values from the price and quantity spinboxes
-                
             price = float(price_spinbox.get())
             quantity = int(quantity_spinbox.get())
 
@@ -291,10 +285,21 @@ class BookManagmentGUI(tk.Tk):
 
     @staticmethod
     def on_table_enter(event):
+            
+        """
+        -> Whenever cursor enter table / click on row change cursor arrow to cursor hand.
+        """
+    
         table_data = event.widget
         table_data["cursor"] = "hand2"
 
     @staticmethod
     def on_table_leave(event):
+        
+                
+        """
+        -> Whenever cursor leave table change cursor to default (arrow).
+        """
+
         table_data = event.widget
         table_data["cursor"] = ""

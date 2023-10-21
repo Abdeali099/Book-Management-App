@@ -7,73 +7,32 @@ from datetime import date, datetime
 from Backend.Database import Database
 
 # <----- Variables -------> #
-form_input_book_data=[]
-GUI = None
+book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
 selected_tree_row_index = ""
 
-# Global variables for images and its data
-book_cover_path = DEFAULT_BOOK_COVER_PATH  = "./assets/byDefaultCover.jpg"
 total_data_count = 0
+
+form_input_book_data=[]
 book_cover_data_list = []
 
-# objects 
+GUI = None
 database=None
 
 class BookServices:
     
     def __init__(self) -> None:
+        
         global database
         
         database=Database()
         
-    @staticmethod
-    def setGUIrefereces(gui_components):
-        global GUI
-        
-        GUI = gui_components
-
-    @staticmethod
-    def fetch_all_data():
-        return Database.fetch_all_data()
-    
-    @staticmethod
-    def insert_data_in_table(table_data,fetched_data):
-        
-        global book_cover_data_list,total_data_count
-        
-        total_data_count=0
-        
-        # fetching previous store data and display it
-        if len(fetched_data) != 0:
-            
-            for data in fetched_data:
-                
-                book_cover_data_list.append(data[-1])
-                
-                row_position = "even_row" if total_data_count%2==0 else "odd_row"
-                
-                table_data.insert('', 'end',tags=(row_position,),image=data[-1], values=data[:-1])
-                
-                total_data_count+=1
-                
-
-    @staticmethod
-    def reset_table():
-        # empty old data
-        BookServices.empty_table()
-        
-        GUI['search_criteria'].set("Id")  # Default search criteria
-        BookServices.insert_data_in_table(GUI['table_data'],Database.fetch_all_data())
-        
-                
     @staticmethod
     def add_book():
             
         global form_input_book_data,total_data_count
             
         """
-        -> Add code to handle adding a book to the data store. \n
-        -> Retrieve data from the input fields and append it to the 'books' list.
+        -> Insert data into database and table.
         """
         
         isInputValid = BookServices.get_input_data()
@@ -94,9 +53,12 @@ class BookServices:
 
                 BookServices.clear_input_fields()
                 
-
     @staticmethod
     def update_book():
+                    
+        """
+        -> Update data to database and table.
+        """
         
         global form_input_book_data,selected_tree_row_index
         
@@ -122,9 +84,14 @@ class BookServices:
                 # update tree
                 GUI['table_data'].item(selected_tree_row_index, image=form_input_book_data[0],values=form_input_book_data[1:-1])
             
+                # BookServices.clear_input_fields() # want to clear all field after update
             
     @staticmethod
     def delete_book():
+                        
+        """
+        -> Delete data from database and table.
+        """
         
         global selected_tree_row_index
         
@@ -144,13 +111,80 @@ class BookServices:
             # delete from table
             GUI['table_data'].delete(selected_tree_row_index)
             
+            # maintain Odd-Even row color
             BookServices.formate_row_color()
 
             BookServices.clear_input_fields()
 
     @staticmethod
-    def formate_row_color():
+    def fetch_all_data():
+                        
+        """
+        -> Fetch all stored data from database. \n
         
+        Returns:
+            _type_: list
+        """
+        
+        return Database.fetch_all_data()
+    
+    @staticmethod
+    def setGUIrefereces(gui_components):
+        
+                        
+        """
+        -> Set refrence for variable/wideget avilable in GUI. \n
+        -> Hepls in other functionalty when want to use GUI.        
+        """
+        
+        global GUI
+        
+        GUI = gui_components
+
+    @staticmethod
+    def insert_data_in_table(table_data,fetched_data):
+                                
+        """
+        -> Insert and shows the data into table. \n
+        """
+        
+        global book_cover_data_list,total_data_count
+        
+        total_data_count=0
+        
+        # fetching previous store data and display it
+        if len(fetched_data) != 0:
+            
+            for data in fetched_data:
+                
+                book_cover_data_list.append(data[-1])
+                
+                row_position = "even_row" if total_data_count%2==0 else "odd_row"
+                
+                table_data.insert('', 'end',tags=(row_position,),image=data[-1], values=data[:-1])
+                
+                total_data_count+=1
+                
+    @staticmethod
+    def reset_table():
+                                        
+        """
+        -> After searching table have searched data , to clear that and get all data back.
+        """
+
+        # empty old data
+        BookServices.empty_table()
+        
+        GUI['search_criteria'].set("Id")  # Default search criteria
+        BookServices.insert_data_in_table(GUI['table_data'],Database.fetch_all_data())
+                
+    @staticmethod
+    def formate_row_color():
+
+        """
+        -> After deleting one row maintain Odd-Even color of row.
+        """
+
         global total_data_count
         
         total_data_count = 0
@@ -165,17 +199,19 @@ class BookServices:
         
     @staticmethod
     def search_books():
+                                     
+        """
+        -> Searching books of dropdown selection and input text.
+        """
         
         # get filed to be search 
         search_field = GUI['search_dropdown'].get().strip().lower().replace(" ", "_")
-        print(search_field)
         
         # get search word
         search_keyword = GUI['search_text'].get()
-        print(search_keyword)
         
         if search_keyword == '':
-            messagebox.showerror('Error', 'Please enter what to be search.')
+            messagebox.showerror('Error', 'Please enter what  to be search.')
             return
         
         if search_field=="id" :
@@ -183,9 +219,7 @@ class BookServices:
                 search_keyword = int(search_keyword)
             except Exception as e :
                 messagebox.showerror('Error', 'Please enter digits for Id.')
-            
-        print("search_filed : " , search_field , " keyword : ",search_keyword)
-        
+                    
         searched_data = Database.query_book(search_field,search_keyword)
         
         if len(searched_data) == 0 :
@@ -199,27 +233,100 @@ class BookServices:
         
     @staticmethod
     def empty_table():
+                                            
+        """
+        -> Empty whole table to enter new data/previous data. \n
+        """
+        
         for item in GUI['table_data'].get_children():
             GUI['table_data'].delete(item)
 
     @staticmethod
-    def convertToBinaryData(file_path):
+    def get_input_data(via="add"):
         
         """
-        -> Convert binary format to images or files data
+        -> Get input data from the form and validate it.\n
+        -> ```via``` checks that cover images changes or not.\n
+            -> default value is "add" and for update it is "update".
+
         Returns:
-            _type_: Binary(BLOB)
+            _type_: boolean
+        """
+        global form_input_book_data
+
+        try:
+                    
+            # Retrieve data from the input fields
+            book_id = GUI['entry_book_id'].get()
+            book_name = GUI['entry_book_name'].get()
+            book_subject = GUI['entry_book_subject'].get()
+            author_name = GUI['entry_author_name'].get()
+            publication = GUI['entry_publication'].get()
+
+            date_of_publication = GUI['date_entry'].get_date()
+            date_of_publication = date_of_publication.strftime("%d/%m/%Y")
+
+            book_price = GUI['price_spinbox'].get()
+            book_quantity = GUI['quantity_spinbox'].get()
+            total_cost = GUI['total_entry'].get()
+            
+            if via == "update" and book_cover_path == DEFAULT_BOOK_COVER_PATH :            
+                user_selected_cover = GUI['table_data'].item(selected_tree_row_index)['image'][0]
+                    
+            else:
+    
+                img_choosen = Image.open(book_cover_path)
+                img_choosen = img_choosen.resize((150,200), reducing_gap=Image.LANCZOS)
+                user_selected_cover = ImageTk.PhotoImage(img_choosen)
+                    
+            form_input_book_data = [user_selected_cover,book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
+
+            return BookServices.is_inputs_valid()
+        
+        except Exception as e :
+            messagebox.showerror('Error', 'Provide proper values!')
+            print("Error in getting book data : ",e)
+            
+    @staticmethod
+    def set_book_cover(img_container,default=False,object=None):
+    
+        """
+        -> Set book cover image to label. \n
+        -> If already object of image is avilable set it directly \n
+        -> If default is False user have to choose path.
         """
         
-        with open(file_path, 'rb') as file:
-            
-            blobData = file.read()
+        global book_cover_path
         
-        return blobData 
+        if not object : 
+            
+            if not default : 
+                book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
+                
+                if not book_cover_path :
+                    return
 
-
+            else:
+                book_cover_path=DEFAULT_BOOK_COVER_PATH
+                
+            img_cover = Image.open(book_cover_path)
+            img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
+            img_cover = ImageTk.PhotoImage(img_cover)
+            img_container.image = img_cover
+            img_container['image'] = img_cover
+            
+        else :
+            img_container.image = object
+            img_container['image'] = object
+    
     @staticmethod
     def is_inputs_valid():
+        
+        """
+        -> Validates input form data
+        Returns:
+            _type_: boolean
+        """
     
         global form_input_book_data
         
@@ -253,82 +360,24 @@ class BookServices:
             return False
 
         return True
-    
-    
-    @staticmethod
-    def get_input_data(via="add"):
-        
-        global form_input_book_data
-
-        try:
-                    
-            # Retrieve data from the input fields
-            book_id = GUI['entry_book_id'].get()
-            book_name = GUI['entry_book_name'].get()
-            book_subject = GUI['entry_book_subject'].get()
-            author_name = GUI['entry_author_name'].get()
-            publication = GUI['entry_publication'].get()
-
-            date_of_publication = GUI['date_entry'].get_date()
-            date_of_publication = date_of_publication.strftime("%d/%m/%Y")
-
-            book_price = GUI['price_spinbox'].get()
-            book_quantity = GUI['quantity_spinbox'].get()
-            total_cost = GUI['total_entry'].get()
-            
-            if via == "update" and book_cover_path == DEFAULT_BOOK_COVER_PATH :
-                
-                user_selected_cover = GUI['table_data'].item(selected_tree_row_index)['image'][0]
-                    
-            else:
-    
-                img_choosen = Image.open(book_cover_path)
-                img_choosen = img_choosen.resize((150,200), reducing_gap=Image.LANCZOS)
-                user_selected_cover = ImageTk.PhotoImage(img_choosen)
-                    
-            form_input_book_data = [user_selected_cover,book_id, book_name, book_subject, author_name, publication, date_of_publication, book_price, book_quantity, total_cost]
-
-            return BookServices.is_inputs_valid()
-        
-        except Exception as e :
-            messagebox.showerror('Error', 'Provide proper values!')
-            print("Error in getting book data : ",e)
-            
 
     @staticmethod
-    def set_book_cover(img_container,default=False,object=None):
-    
+    def convertToBinaryData(file_path):
+        
         """
-        -> Set book cover image to label. \n
-        -> If default is False user have to choose path.
+        -> Convert binary format to images or files data
+        Returns:
+            _type_: Binary(BLOB)
         """
         
-        global book_cover_path
+        with open(file_path, 'rb') as file:
+            
+            blobData = file.read()
         
-        if not object : 
-            
-            if not default : 
-                book_cover_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-                
-                if not book_cover_path :
-                    return
-
-            else:
-                book_cover_path=DEFAULT_BOOK_COVER_PATH
-                
-            img_cover = Image.open(book_cover_path)
-            img_cover = img_cover.resize((150, 200), reducing_gap=Image.LANCZOS)
-            img_cover = ImageTk.PhotoImage(img_cover)
-            img_container.image = img_cover
-            img_container['image'] = img_cover
-            
-        else :
-            img_container.image = object
-            img_container['image'] = object
-            
-
+        return blobData 
+                    
     @staticmethod
-    def get_confirmation(msg="Are you sure, you want to proceed??"):
+    def get_confirmation(msg="Are you sure, you want to proceed?"):
         
         """
         -> Custom message Confirmation window. \n
@@ -337,56 +386,13 @@ class BookServices:
         
         result = messagebox.askyesno("Confirmation", msg)
         return result
-        
-
-    @staticmethod
-    def clear_input_fields(confirmation=False):
-        
-        global selected_tree_row_index
-            
-        """
-        -> This function clear the input fields and set initial value of some entries. \n
-        -> Use also as "Cancel".
-        """
-        
-        if confirmation :
-            do_clear=BookServices.get_confirmation("Are you sure to clear fields?")
-            
-            if not do_clear:
-                return
-        
-        GUI['entry_book_id'].config(state="normal",cursor="xterm")
-        GUI['entry_book_id'].delete(0, tk.END)
-        GUI['entry_book_name'].delete(0, tk.END)
-        GUI['entry_book_subject'].delete(0, tk.END)
-        GUI['entry_author_name'].delete(0, tk.END)
-        GUI['entry_publication'].delete(0, tk.END)
-        
-        GUI['date_entry'].set_date(date.today())
-        
-        GUI['price_spinbox'].delete(0,tk.END)  
-        GUI['price_spinbox'].insert(0, "0.00")
-        
-        GUI['quantity_spinbox'].delete(0, tk.END)  
-        GUI['quantity_spinbox'].insert(0, "0")
-        
-        GUI['total_entry'].config(state="normal")  
-        GUI['total_entry'].delete(0, tk.END)  
-        GUI['total_entry'].insert(0, "0.00")
-        GUI['total_entry'].config(state="readonly") 
-        
-        #table related
-        selected_tree_row_index=""
-        
-        selected_item = GUI['table_data'].selection()
-        
-        if selected_item:
-                GUI['table_data'].selection_remove(selected_item)
-    
-        BookServices.set_book_cover(GUI['img_container'],default=True)
-        
+                
     @staticmethod
     def select_row_of_table(event):
+        
+        """
+        -> Whenver row selected , show its data to into form field. 
+        """
         
         global selected_tree_row_index
 
@@ -432,3 +438,50 @@ class BookServices:
 
         except Exception as e:
             print("Error in selection row  : ", e)
+
+    @staticmethod
+    def clear_input_fields(confirmation=False):
+         
+        """
+        -> This function clear the input fields and set initial value of some entries. \n
+        -> Use also as "Cancel".
+        """
+        
+        global selected_tree_row_index
+        
+        if confirmation :
+            do_clear=BookServices.get_confirmation("Are you sure to clear fields?")
+            
+            if not do_clear:
+                return
+        
+        GUI['entry_book_id'].config(state="normal",cursor="xterm")
+        GUI['entry_book_id'].delete(0, tk.END)
+        GUI['entry_book_name'].delete(0, tk.END)
+        GUI['entry_book_subject'].delete(0, tk.END)
+        GUI['entry_author_name'].delete(0, tk.END)
+        GUI['entry_publication'].delete(0, tk.END)
+        
+        GUI['date_entry'].set_date(date.today())
+        
+        GUI['price_spinbox'].delete(0,tk.END)  
+        GUI['price_spinbox'].insert(0, "0.00")
+        
+        GUI['quantity_spinbox'].delete(0, tk.END)  
+        GUI['quantity_spinbox'].insert(0, "0")
+        
+        GUI['total_entry'].config(state="normal")  
+        GUI['total_entry'].delete(0, tk.END)  
+        GUI['total_entry'].insert(0, "0.00")
+        GUI['total_entry'].config(state="readonly") 
+        
+        BookServices.set_book_cover(GUI['img_container'],default=True)
+        
+        # clear selection from table
+        selected_tree_row_index=""
+        
+        selected_item = GUI['table_data'].selection()
+        
+        if selected_item:
+                GUI['table_data'].selection_remove(selected_item)
+    
